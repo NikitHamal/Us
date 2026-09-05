@@ -123,7 +123,23 @@
     <string name="coach_empty_body">Type your draft above, or share a message into Us from Instagram or Messenger.</string>
     <string name="coach_analyzing">Reading the tone…</string>
     <string name="coach_provider_offline">Analysed on device</string>
+    <string name="coach_provider_nebians">Analysed by Nebians</string>
     <string name="coach_provider_cloud">Analysed by your cloud model</string>
+    <string name="coach_attach">Attach a file</string>
+    <string name="coach_model_offline">Offline only — turn on cloud AI for models</string>
+    <string name="coach_model_change">Change model</string>
+    <string name="coach_model_title">Choose a model</string>
+    <string name="coach_model_body">Free Nebians models need no key. Scraped models answer through an on-device tool protocol, so the coach can still read your timeline before replying.</string>
+    <string name="coach_model_provider">Provider</string>
+    <string name="coach_model_model">Model</string>
+    <string name="coach_model_effort">Reasoning effort</string>
+    <string name="coach_model_temperature">Temperature: %1$.2f</string>
+    <string name="coach_model_max_tokens">Max tokens</string>
+    <string name="coach_model_needs_key">Needs an API key</string>
+    <string name="coach_model_cap_files">File uploads supported</string>
+    <string name="coach_model_cap_thinking">Reasoning model</string>
+    <string name="coach_model_cap_search">Web search</string>
+    <string name="coach_model_key_hint">Add your key in Settings to use this provider.</string>
 
     <!-- Share -->
     <string name="share_title">Shared into Us</string>
@@ -206,6 +222,9 @@
     <string name="settings_notification_grant">Grant notification access</string>
     <string name="settings_notification_granted">Access granted</string>
     <string name="settings_section_ai">AI provider</string>
+    <string name="settings_section_nebians">Nebians models</string>
+    <string name="settings_nebians_body">Free models answer with no key. Pick a provider and a live model; the coach uses it for open questions, and for tone checks the on-device engine is unsure about.</string>
+    <string name="settings_nebians_files">This provider accepts file attachments in the coach.</string>
     <string name="settings_cloud_toggle">Use cloud AI</string>
     <string name="settings_cloud_body">Off by default. When on, only the text you explicitly analyse is sent to the endpoint you configure below.</string>
     <string name="settings_base_url">Base URL</string>

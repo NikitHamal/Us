@@ -54,5 +54,7 @@ class SecureStore @Inject constructor(
         const val KEY_API_KEY = "cloud_api_key"
         const val KEY_MODEL_NAME = "cloud_model_name"
         const val KEY_EMBEDDING_MODEL = "cloud_embedding_model"
+        const val KEY_NEBIANS_API_KEY = "nebians_api_key"
+        const val KEY_NEBIANS_BASE_URL = "nebians_base_url"
     }
 }

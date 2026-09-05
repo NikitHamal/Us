@@ -13,6 +13,8 @@ import com.us.copilot.ai.CloudEnabledSource
 import com.us.copilot.data.local.crypto.SecureStore
 import com.us.copilot.domain.repository.AppPreferences
 import com.us.copilot.domain.repository.CloudCredentials
+import com.us.copilot.domain.repository.NebiansConfig
+import com.us.copilot.domain.repository.NebiansEffort
 import com.us.copilot.domain.repository.SettingsRepository
 import com.us.copilot.domain.repository.ThemeMode
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,6 +51,11 @@ class SettingsRepositoryImpl @Inject constructor(
         val lastInsightRefresh = longPreferencesKey("last_insight_refresh")
         val watchedPackages = stringSetPreferencesKey("watched_packages")
         val notificationToneCheck = booleanPreferencesKey("notification_tone_check")
+        val nebiansProvider = stringPreferencesKey("nebians_provider")
+        val nebiansModel = stringPreferencesKey("nebians_model")
+        val nebiansEffort = stringPreferencesKey("nebians_effort")
+        val nebiansTemperature = stringPreferencesKey("nebians_temperature")
+        val nebiansMaxTokens = stringPreferencesKey("nebians_max_tokens")
     }
 
     private val credentialsState = MutableStateFlow(readCredentials())
@@ -74,6 +82,21 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override val enabled: Flow<Boolean> get() = cloudEnabled
 
+    override val nebiansConfig: Flow<NebiansConfig> =
+        context.settingsDataStore.data.map { prefs ->
+            NebiansConfig(
+                providerSlug = prefs[Keys.nebiansProvider]?.ifBlank { null } ?: "tryingopen",
+                modelId = prefs[Keys.nebiansModel].orEmpty(),
+                effort = prefs[Keys.nebiansEffort]
+                    ?.let { name -> NebiansEffort.entries.firstOrNull { it.name == name } }
+                    ?: NebiansEffort.BALANCED,
+                temperature = prefs[Keys.nebiansTemperature]?.toFloatOrNull()?.coerceIn(0f, 2f) ?: 0.4f,
+                maxTokens = prefs[Keys.nebiansMaxTokens]?.toIntOrNull()?.coerceIn(16, 8000) ?: 900,
+                apiKey = secureStore.getString(SecureStore.KEY_NEBIANS_API_KEY),
+                baseUrlOverride = secureStore.getString(SecureStore.KEY_NEBIANS_BASE_URL),
+            )
+        }.distinctUntilChanged()
+
     override suspend fun cloudCredentials(): CloudCredentials = readCredentials()
 
     override fun cloudCredentialsFlow(): Flow<CloudCredentials> = credentialsState.asStateFlow()
@@ -94,6 +117,39 @@ class SettingsRepositoryImpl @Inject constructor(
             SecureStore.KEY_EMBEDDING_MODEL,
         )
         credentialsState.value = CloudCredentials()
+    }
+
+    override suspend fun nebiansConfigSnapshot(): NebiansConfig = first(nebiansConfig)
+
+    override suspend fun setNebiansProvider(slug: String) {
+        context.settingsDataStore.edit { it[Keys.nebiansProvider] = slug.trim().lowercase() }
+        // Switching provider resets the model to its default.
+        context.settingsDataStore.edit { it[Keys.nebiansModel] = "" }
+    }
+
+    override suspend fun setNebiansModel(modelId: String) {
+        context.settingsDataStore.edit { it[Keys.nebiansModel] = modelId.trim() }
+    }
+
+    override suspend fun setNebiansEffort(effort: NebiansEffort) {
+        context.settingsDataStore.edit { it[Keys.nebiansEffort] = effort.name }
+    }
+
+    override suspend fun setNebiansTemperature(value: Float) {
+        context.settingsDataStore.edit { it[Keys.nebiansTemperature] = value.coerceIn(0f, 2f).toString() }
+    }
+
+    override suspend fun setNebiansMaxTokens(value: Int) {
+        context.settingsDataStore.edit { it[Keys.nebiansMaxTokens] = value.coerceIn(16, 8000).toString() }
+    }
+
+    override suspend fun saveNebiansCredentials(apiKey: String, baseUrlOverride: String) {
+        secureStore.putString(SecureStore.KEY_NEBIANS_API_KEY, apiKey.trim())
+        secureStore.putString(SecureStore.KEY_NEBIANS_BASE_URL, baseUrlOverride.trim())
+    }
+
+    override suspend fun clearNebiansCredentials() {
+        secureStore.remove(SecureStore.KEY_NEBIANS_API_KEY, SecureStore.KEY_NEBIANS_BASE_URL)
     }
 
     override suspend fun setOnboardingComplete(complete: Boolean) = write(Keys.onboarding, complete)

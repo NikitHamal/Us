@@ -29,9 +29,20 @@ data class AgentRequestSpec(
     val userMessage: String,
     /** Prior turns, oldest first, so the agent has conversational memory. */
     val history: List<AgentHistoryEntry> = emptyList(),
+    /** Files attached to this turn (screenshots, docs). Only file-capable models receive them. */
+    val attachments: List<AgentAttachment> = emptyList(),
 )
 
 data class AgentHistoryEntry(val isUser: Boolean, val text: String)
+
+/** One file carried with an agent turn, as base64 so any client can encode it. */
+data class AgentAttachment(
+    val filename: String,
+    val mimeType: String,
+    val base64: String,
+) {
+    val isImage: Boolean get() = mimeType.startsWith("image/")
+}
 
 /** The result of one agent turn. */
 data class AgentTurn(

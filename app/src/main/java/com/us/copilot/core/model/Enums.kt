@@ -92,5 +92,6 @@ enum class RephraseStyle(val label: String, val intent: String) {
 /** Which engine answered a request. */
 enum class ProviderId(val label: String) {
     OFFLINE("On-device"),
+    NEBIANS("Nebians"),
     CLOUD("Cloud model"),
 }

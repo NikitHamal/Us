@@ -46,7 +46,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.us.copilot.BuildConfig
 import com.us.copilot.R
+import com.us.copilot.ai.nebians.NebiansCatalog
 import com.us.copilot.domain.repository.ThemeMode
+import com.us.copilot.ui.coach.NebiansModelList
+import com.us.copilot.ui.coach.NebiansProviderList
+import com.us.copilot.ui.coach.ReasoningControls
 import com.us.copilot.ui.components.LoadingState
 import com.us.copilot.ui.components.SectionHeader
 import com.us.copilot.ui.components.UsCard
@@ -176,6 +180,8 @@ fun SettingsScreen(
             }
 
             AiProviderCard(state = state, viewModel = viewModel, savedLabel = savedLabel)
+
+            NebiansProviderCard(state = state, viewModel = viewModel, savedLabel = savedLabel)
 
             UsCard {
                 SectionHeader(title = stringResource(R.string.settings_section_appearance))
@@ -350,6 +356,147 @@ private fun AiProviderCard(
                 )
                 else -> Unit
             }
+        }
+    }
+}
+
+/**
+ * The Nebians fleet: provider + live model list, reasoning config for
+ * supported models, key fields only for providers that need one, and file
+ * support notes where uploads apply.
+ */
+@Composable
+private fun NebiansProviderCard(
+    state: SettingsUiState,
+    viewModel: SettingsViewModel,
+    savedLabel: String,
+) {
+    val selected = NebiansCatalog.find(state.nebians.providerSlug)
+    UsCard {
+        SectionHeader(title = stringResource(R.string.settings_section_nebians))
+        Text(
+            stringResource(R.string.settings_nebians_body),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+
+        NebiansProviderList(
+            selectedSlug = state.nebians.providerSlug,
+            onSelect = viewModel::selectNebiansProvider,
+        )
+
+        if (selected != null && selected.models.isNotEmpty()) {
+            Text(
+                stringResource(R.string.coach_model_model),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+            NebiansModelList(
+                provider = selected,
+                selectedModelId = state.nebians.modelId,
+                onSelect = viewModel::selectNebiansModel,
+            )
+        }
+
+        if (selected != null) {
+            ReasoningControls(
+                config = state.nebians,
+                provider = selected,
+                onSelectEffort = viewModel::selectNebiansEffort,
+                onSelectTemperature = viewModel::selectNebiansTemperature,
+                onSelectMaxTokens = viewModel::selectNebiansMaxTokens,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+            if (selected.supportsFiles) {
+                Text(
+                    stringResource(R.string.settings_nebians_files),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+            }
+        }
+
+        if (selected != null && (selected.keyRequired || selected.slug == "custom")) {
+            if (selected.slug == "custom") {
+                OutlinedTextField(
+                    value = state.nebiansBaseUrl,
+                    onValueChange = viewModel::editNebiansBaseUrl,
+                    label = { Text(stringResource(R.string.settings_base_url)) },
+                    placeholder = { Text(stringResource(R.string.settings_base_url_hint)) },
+                    singleLine = true,
+                    shape = UsShapes.medium,
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                )
+                OutlinedTextField(
+                    value = state.nebiansKey,
+                    onValueChange = viewModel::editNebiansKey,
+                    label = { Text(stringResource(R.string.settings_api_key)) },
+                    placeholder = { Text(stringResource(R.string.settings_api_key_hint)) },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    shape = UsShapes.medium,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+                OutlinedTextField(
+                    value = state.nebians.modelId,
+                    onValueChange = viewModel::selectNebiansModel,
+                    label = { Text(stringResource(R.string.settings_model)) },
+                    placeholder = { Text(stringResource(R.string.settings_model_hint)) },
+                    singleLine = true,
+                    shape = UsShapes.medium,
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                )
+            } else {
+                OutlinedTextField(
+                    value = state.nebiansKey,
+                    onValueChange = viewModel::editNebiansKey,
+                    label = { Text(stringResource(R.string.settings_api_key)) },
+                    placeholder = { Text(stringResource(R.string.settings_api_key_hint)) },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    shape = UsShapes.medium,
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                )
+            }
+
+            Row(
+                Modifier.fillMaxWidth().padding(top = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Button(
+                    onClick = { viewModel.saveNebiansCredentials(savedLabel) },
+                    modifier = Modifier.weight(1f),
+                ) { Text(stringResource(R.string.action_save)) }
+                OutlinedButton(
+                    onClick = viewModel::testNebiansConnection,
+                    enabled = state.nebiansTest !is ConnectionTest.Running,
+                    modifier = Modifier.weight(1f),
+                ) { Text(stringResource(R.string.settings_test_connection)) }
+            }
+        } else {
+            OutlinedButton(
+                onClick = viewModel::testNebiansConnection,
+                enabled = state.nebiansTest !is ConnectionTest.Running,
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            ) { Text(stringResource(R.string.settings_test_connection)) }
+        }
+
+        when (val test = state.nebiansTest) {
+            ConnectionTest.Success -> Text(
+                stringResource(R.string.settings_connection_ok),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.tertiary,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            is ConnectionTest.Failed -> Text(
+                stringResource(R.string.settings_connection_failed, messageFor(test.error)),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp),
+            )
+            else -> Unit
         }
     }
 }

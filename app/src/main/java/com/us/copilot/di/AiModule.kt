@@ -4,7 +4,9 @@ import com.us.copilot.ai.CloudEnabledSource
 import com.us.copilot.ai.CloudGate
 import com.us.copilot.ai.LlmProvider
 import com.us.copilot.ai.LlmRouter
+import com.us.copilot.ai.NebiansGate
 import com.us.copilot.ai.cloud.CloudProvider
+import com.us.copilot.ai.nebians.NebiansProvider
 import com.us.copilot.ai.offline.OfflineProvider
 import dagger.Module
 import dagger.Provides
@@ -22,6 +24,7 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Qualifier @Retention(AnnotationRetention.BINARY) annotation class Offline
+@Qualifier @Retention(AnnotationRetention.BINARY) annotation class Nebians
 @Qualifier @Retention(AnnotationRetention.BINARY) annotation class Cloud
 
 @Module
@@ -53,6 +56,9 @@ object AiModule {
     @Provides @Singleton @Offline
     fun provideOfflineProvider(provider: OfflineProvider): LlmProvider = provider
 
+    @Provides @Singleton @Nebians
+    fun provideNebiansProvider(provider: NebiansProvider): LlmProvider = provider
+
     @Provides @Singleton @Cloud
     fun provideCloudProvider(provider: CloudProvider): LlmProvider = provider
 
@@ -67,9 +73,20 @@ object AiModule {
 
     @Provides
     @Singleton
+    fun provideNebiansGate(
+        source: CloudEnabledSource,
+        @Nebians nebians: LlmProvider,
+    ): NebiansGate = object : NebiansGate {
+        override suspend fun isNebiansUsable(): Boolean = source.enabled.first() && nebians.isAvailable()
+    }
+
+    @Provides
+    @Singleton
     fun provideLlmRouter(
         @Offline offline: LlmProvider,
+        @Nebians nebians: LlmProvider,
         @Cloud cloud: LlmProvider,
         gate: CloudGate,
-    ): LlmRouter = LlmRouter(offline, cloud, gate)
+        nebiansGate: NebiansGate,
+    ): LlmRouter = LlmRouter(offline, nebians, cloud, gate, nebiansGate)
 }

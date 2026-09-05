@@ -41,14 +41,44 @@ data class AppPreferences(
 
 enum class ThemeMode(val label: String) { SYSTEM("Follow system"), LIGHT("Light"), DARK("Dark") }
 
+/** Reasoning effort for TryingOpen-style providers (ported from Nebians). */
+enum class NebiansEffort(val label: String) { QUICK("Quick"), BALANCED("Balanced"), DEEP("Deep") }
+
+/**
+ * Which Nebians model answers cloud requests.
+ *
+ * Non-sensitive parts live in DataStore; [apiKey]/[baseUrlOverride] live in encrypted storage.
+ * An empty [modelId] means the provider default. [effort] only applies to effort-style
+ * providers (TryingOpen); [temperature]/[maxTokens] only to temperature-style ones.
+ */
+data class NebiansConfig(
+    val providerSlug: String = "tryingopen",
+    val modelId: String = "",
+    val effort: NebiansEffort = NebiansEffort.BALANCED,
+    val temperature: Float = 0.4f,
+    val maxTokens: Int = 900,
+    val apiKey: String = "",
+    val baseUrlOverride: String = "",
+)
+
 interface SettingsRepository {
     val preferences: Flow<AppPreferences>
     val cloudEnabled: Flow<Boolean>
+    val nebiansConfig: Flow<NebiansConfig>
 
     suspend fun cloudCredentials(): CloudCredentials
     fun cloudCredentialsFlow(): Flow<CloudCredentials>
     suspend fun saveCloudCredentials(credentials: CloudCredentials)
     suspend fun clearCloudCredentials()
+
+    suspend fun nebiansConfigSnapshot(): NebiansConfig
+    suspend fun setNebiansProvider(slug: String)
+    suspend fun setNebiansModel(modelId: String)
+    suspend fun setNebiansEffort(effort: NebiansEffort)
+    suspend fun setNebiansTemperature(value: Float)
+    suspend fun setNebiansMaxTokens(value: Int)
+    suspend fun saveNebiansCredentials(apiKey: String, baseUrlOverride: String)
+    suspend fun clearNebiansCredentials()
 
     suspend fun setOnboardingComplete(complete: Boolean)
     suspend fun setBiometricLock(enabled: Boolean)

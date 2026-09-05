@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.us.copilot.ui.theme.UsShapes
 
-/** The house card: 28dp corners, soft container, consistent padding. */
+/** The house card: 28dp corners, soft container, consistent padding. Flat — no shadow, ever. */
 @Composable
 fun UsCard(
     modifier: Modifier = Modifier,
@@ -37,8 +37,9 @@ fun UsCard(
     content: @Composable androidx.compose.foundation.layout.ColumnScope.() -> Unit,
 ) {
     val colors = CardDefaults.cardColors(containerColor = containerColor)
+    val elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     if (onClick == null) {
-        Card(modifier = modifier.fillMaxWidth(), shape = UsShapes.large, colors = colors) {
+        Card(modifier = modifier.fillMaxWidth(), shape = UsShapes.large, colors = colors, elevation = elevation) {
             Column(Modifier.padding(20.dp), content = content)
         }
     } else {
@@ -47,6 +48,7 @@ fun UsCard(
             modifier = modifier.fillMaxWidth(),
             shape = UsShapes.large,
             colors = colors,
+            elevation = elevation,
         ) {
             Column(Modifier.padding(20.dp), content = content)
         }

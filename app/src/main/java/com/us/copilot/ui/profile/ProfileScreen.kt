@@ -83,6 +83,12 @@ fun ProfileScreen(
                 icon = { Icon(Icons.Filled.Edit, contentDescription = null) },
                 text = { Text(stringResource(R.string.action_edit)) },
                 modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
+                elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    focusedElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                ),
             )
         },
     ) { innerPadding ->

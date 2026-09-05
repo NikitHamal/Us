@@ -1,5 +1,6 @@
 package com.us.copilot.ui.coach
 
+import android.net.Uri
 import androidx.annotation.StringRes
 import com.us.copilot.R
 import com.us.copilot.ai.agent.AgentStep
@@ -75,3 +76,11 @@ enum class CoachStarter(
     BOUNDARY(R.string.coach_starter_boundary, R.string.coach_starter_boundary_prompt),
     REPAIR(R.string.coach_starter_repair, R.string.coach_starter_repair_prompt),
 }
+
+/** A file staged on the composer but not yet sent. Bytes are read at send time. */
+data class AttachmentUi(
+    val uri: Uri,
+    val name: String,
+    val mimeType: String,
+    val sizeBytes: Long,
+)

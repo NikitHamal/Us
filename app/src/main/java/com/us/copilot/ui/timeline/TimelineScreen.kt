@@ -70,6 +70,12 @@ fun TimelineScreen(
                 icon = { Icon(Icons.Filled.Add, contentDescription = null) },
                 text = { Text(stringResource(R.string.home_action_journal)) },
                 modifier = Modifier.padding(bottom = contentPadding.calculateBottomPadding()),
+                elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    focusedElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                ),
             )
         },
     ) { innerPadding ->

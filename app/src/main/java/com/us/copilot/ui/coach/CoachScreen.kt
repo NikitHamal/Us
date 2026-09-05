@@ -1,5 +1,7 @@
 package com.us.copilot.ui.coach
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -62,9 +64,13 @@ fun CoachScreen(
     viewModel: CoachViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val cloudEnabled by viewModel.cloudEnabled.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     val savedLabel = stringResource(R.string.share_saved)
+    val filePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris ->
+        viewModel.addAttachments(uris)
+    }
 
     LaunchedEffect(prefillText) {
         if (!prefillText.isNullOrBlank()) viewModel.prefill(prefillText)
@@ -74,6 +80,13 @@ fun CoachScreen(
         if (state.savedMessage) {
             snackbarHostState.showSnackbar(savedLabel)
             viewModel.consumeSavedMessage()
+        }
+    }
+
+    LaunchedEffect(state.attachError) {
+        state.attachError?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.consumeAttachError()
         }
     }
 
@@ -129,24 +142,51 @@ fun CoachScreen(
                     listState = listState,
                     onUseRewrite = viewModel::useRewrite,
                     onRetry = viewModel::retry,
-                    bottomInset = 0.dp,
+                    bottomInset = 56.dp,
                 )
             }
 
-            ChatComposer(
-                value = state.draft,
-                onValueChange = viewModel::onDraftChange,
-                onSend = viewModel::ask,
-                onCheckDraft = viewModel::analyze,
-                enabled = !state.isBusy,
+            Column(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(horizontal = 12.dp)
                     .padding(bottom = 8.dp)
                     .navigationBarsPadding()
                     .imePadding(),
-            )
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                ModelBar(
+                    modelLabel = state.modelLabel,
+                    cloudEnabled = cloudEnabled,
+                    onOpenSheet = { viewModel.setModelSheetVisible(true) },
+                )
+                AttachmentChips(
+                    attachments = state.attachments,
+                    onRemove = { viewModel.removeAttachment(it.uri) },
+                )
+                ChatComposer(
+                    value = state.draft,
+                    onValueChange = viewModel::onDraftChange,
+                    onSend = viewModel::ask,
+                    onCheckDraft = viewModel::analyze,
+                    enabled = !state.isBusy,
+                    canAttach = state.canAttach && cloudEnabled,
+                    onAttach = { filePicker.launch("*/*") },
+                )
+            }
         }
+    }
+
+    if (state.showModelSheet) {
+        ModelSheet(
+            config = state.nebians,
+            onDismiss = { viewModel.setModelSheetVisible(false) },
+            onSelectProvider = viewModel::selectProvider,
+            onSelectModel = viewModel::selectModel,
+            onSelectEffort = viewModel::selectEffort,
+            onSelectTemperature = { viewModel.selectTemperature(it) },
+            onSelectMaxTokens = { viewModel.selectMaxTokens(it) },
+        )
     }
 }
 

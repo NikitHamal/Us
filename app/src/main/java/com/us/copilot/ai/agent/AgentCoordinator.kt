@@ -1,5 +1,6 @@
 package com.us.copilot.ai.agent
 
+import com.us.copilot.ai.nebians.NebiansAgentRunner
 import com.us.copilot.core.util.Outcome
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -7,14 +8,16 @@ import javax.inject.Singleton
 /**
  * Chooses which runner handles a turn.
  *
- * Prefers the cloud agent when the user has configured and enabled one, because only it can do
- * real multi-turn tool calling. Falls back to the on-device runner otherwise — and also when the
- * cloud call fails, so a dropped connection degrades to grounded local retrieval instead of an
- * error bubble.
+ * Prefers the native tool-calling cloud agent when configured, then the
+ * Nebians autonomous agent (Hermes XML tool protocol over free keyless
+ * models), and finally the on-device heuristic. A failed network runner
+ * degrades to the next one down, so a dropped connection ends in grounded
+ * local retrieval instead of an error bubble.
  */
 @Singleton
 class AgentCoordinator @Inject constructor(
     private val cloud: CloudAgentRunner,
+    private val nebians: NebiansAgentRunner,
     private val offline: OfflineAgentRunner,
 ) {
 
@@ -22,14 +25,24 @@ class AgentCoordinator @Inject constructor(
         if (cloud.isAvailable()) {
             when (val result = cloud.run(request)) {
                 is Outcome.Success -> return result
-                is Outcome.Failure -> Unit // fall through to offline
+                is Outcome.Failure -> Unit // fall through to Nebians
+            }
+        }
+        if (nebians.isAvailable()) {
+            when (val result = nebians.run(request)) {
+                is Outcome.Success -> return result
+                is Outcome.Failure -> {
+                    // A hard config error (unknown provider) should surface rather than
+                    // masquerade as an offline answer; transient failures fall through.
+                    if (result.error is com.us.copilot.core.util.AppError.MissingCredentials) return result
+                }
             }
         }
         return offline.run(request)
     }
 
     /** True when a real tool-calling agent is driving, rather than the heuristic fallback. */
-    suspend fun isFullAgentAvailable(): Boolean = cloud.isAvailable()
+    suspend fun isFullAgentAvailable(): Boolean = cloud.isAvailable() || nebians.isAvailable()
 
     companion object {
         val SYSTEM_PROMPT = """

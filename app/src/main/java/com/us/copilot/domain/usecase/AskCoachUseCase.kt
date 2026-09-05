@@ -1,5 +1,6 @@
 package com.us.copilot.domain.usecase
 
+import com.us.copilot.ai.agent.AgentAttachment
 import com.us.copilot.ai.agent.AgentCoordinator
 import com.us.copilot.ai.agent.AgentHistoryEntry
 import com.us.copilot.ai.agent.AgentRequestSpec
@@ -20,11 +21,13 @@ class AskCoachUseCase @Inject constructor(
     suspend operator fun invoke(
         message: String,
         history: List<AgentHistoryEntry> = emptyList(),
+        attachments: List<AgentAttachment> = emptyList(),
     ): Outcome<AgentTurn> = coordinator.run(
         AgentRequestSpec(
             systemPrompt = AgentCoordinator.SYSTEM_PROMPT,
             userMessage = message,
             history = history.takeLast(MAX_HISTORY),
+            attachments = attachments,
         ),
     )
 

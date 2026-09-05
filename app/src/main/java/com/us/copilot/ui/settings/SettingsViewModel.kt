@@ -8,8 +8,11 @@ import com.us.copilot.ai.offline.CactModelLoader
 import com.us.copilot.core.util.AppError
 import com.us.copilot.core.util.Outcome
 import com.us.copilot.di.Cloud
+import com.us.copilot.di.Nebians
 import com.us.copilot.domain.repository.AppPreferences
 import com.us.copilot.domain.repository.CloudCredentials
+import com.us.copilot.domain.repository.NebiansConfig
+import com.us.copilot.domain.repository.NebiansEffort
 import com.us.copilot.domain.repository.SettingsRepository
 import com.us.copilot.domain.repository.ThemeMode
 import com.us.copilot.domain.usecase.WipeAllDataUseCase
@@ -32,8 +35,12 @@ data class SettingsUiState(
     val isLoading: Boolean = true,
     val prefs: AppPreferences = AppPreferences(),
     val credentials: CloudCredentials = CloudCredentials(),
+    val nebians: NebiansConfig = NebiansConfig(),
+    val nebiansKey: String = "",
+    val nebiansBaseUrl: String = "",
     val modelState: String = "",
     val connectionTest: ConnectionTest = ConnectionTest.Idle,
+    val nebiansTest: ConnectionTest = ConnectionTest.Idle,
     val showWipeDialog: Boolean = false,
     val snackbar: String? = null,
 )
@@ -44,6 +51,7 @@ class SettingsViewModel @Inject constructor(
     private val wipeAllData: WipeAllDataUseCase,
     private val modelLoader: CactModelLoader,
     @Cloud private val cloudProvider: LlmProvider,
+    @Nebians private val nebiansProvider: LlmProvider,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -54,6 +62,15 @@ class SettingsViewModel @Inject constructor(
             settings.preferences.collect { prefs ->
                 _uiState.update { it.copy(isLoading = false, prefs = prefs) }
             }
+        }
+        viewModelScope.launch {
+            settings.nebiansConfig.collect { config ->
+                _uiState.update { it.copy(nebians = config) }
+            }
+        }
+        viewModelScope.launch {
+            val snapshot = settings.nebiansConfigSnapshot()
+            _uiState.update { it.copy(nebiansKey = snapshot.apiKey, nebiansBaseUrl = snapshot.baseUrlOverride) }
         }
         viewModelScope.launch {
             _uiState.update { it.copy(credentials = settings.cloudCredentials()) }
@@ -106,17 +123,74 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    // --- Nebians fleet -------------------------------------------------------
+
+    fun selectNebiansProvider(slug: String) {
+        _uiState.update { it.copy(nebiansTest = ConnectionTest.Idle) }
+        viewModelScope.launch { settings.setNebiansProvider(slug) }
+    }
+
+    fun selectNebiansModel(modelId: String) {
+        _uiState.update { it.copy(nebiansTest = ConnectionTest.Idle) }
+        viewModelScope.launch { settings.setNebiansModel(modelId) }
+    }
+
+    fun selectNebiansEffort(effort: NebiansEffort) {
+        viewModelScope.launch { settings.setNebiansEffort(effort) }
+    }
+
+    fun selectNebiansTemperature(value: Float) {
+        viewModelScope.launch { settings.setNebiansTemperature(value) }
+    }
+
+    fun selectNebiansMaxTokens(value: Int) {
+        viewModelScope.launch { settings.setNebiansMaxTokens(value) }
+    }
+
+    fun editNebiansKey(value: String) = _uiState.update { it.copy(nebiansKey = value) }
+
+    fun editNebiansBaseUrl(value: String) = _uiState.update { it.copy(nebiansBaseUrl = value) }
+
+    fun saveNebiansCredentials(savedMessage: String) {
+        viewModelScope.launch {
+            settings.saveNebiansCredentials(_uiState.value.nebiansKey, _uiState.value.nebiansBaseUrl)
+            _uiState.update { it.copy(snackbar = savedMessage) }
+        }
+    }
+
+    fun testNebiansConnection() {
+        if (_uiState.value.nebiansTest is ConnectionTest.Running) return
+        _uiState.update { it.copy(nebiansTest = ConnectionTest.Running) }
+        viewModelScope.launch {
+            settings.saveNebiansCredentials(_uiState.value.nebiansKey, _uiState.value.nebiansBaseUrl)
+            val result = nebiansProvider.analyzeTone(
+                ToneRequest(text = "Hey, are we okay? I have been thinking about last night."),
+            )
+            _uiState.update {
+                it.copy(
+                    nebiansTest = when (result) {
+                        is Outcome.Success -> ConnectionTest.Success
+                        is Outcome.Failure -> ConnectionTest.Failed(result.error)
+                    },
+                )
+            }
+        }
+    }
+
     fun setWipeDialogVisible(visible: Boolean) = _uiState.update { it.copy(showWipeDialog = visible) }
 
     fun wipeEverything(confirmationMessage: String) {
         viewModelScope.launch {
             wipeAllData()
             settings.clearCloudCredentials()
+            settings.clearNebiansCredentials()
             settings.setOnboardingComplete(false)
             _uiState.update {
                 it.copy(
                     showWipeDialog = false,
                     credentials = CloudCredentials(),
+                    nebiansKey = "",
+                    nebiansBaseUrl = "",
                     snackbar = confirmationMessage,
                 )
             }

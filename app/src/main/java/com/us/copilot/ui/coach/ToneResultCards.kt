@@ -122,10 +122,10 @@ fun ToneResultCard(tone: ToneAnalysis, modifier: Modifier = Modifier) {
 @Composable
 fun ProviderBadge(provider: ProviderId, confidence: Float, modifier: Modifier = Modifier) {
     val label = stringResource(
-        if (provider == ProviderId.OFFLINE) {
-            R.string.coach_provider_offline
-        } else {
-            R.string.coach_provider_cloud
+        when (provider) {
+            ProviderId.OFFLINE -> R.string.coach_provider_offline
+            ProviderId.NEBIANS -> R.string.coach_provider_nebians
+            ProviderId.CLOUD -> R.string.coach_provider_cloud
         },
     )
     val description = stringResource(R.string.cd_provider_badge, provider.label)
