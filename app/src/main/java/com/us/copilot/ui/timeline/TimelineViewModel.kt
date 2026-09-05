@@ -13,6 +13,7 @@ import com.us.copilot.domain.usecase.ObserveTagsUseCase
 import com.us.copilot.domain.usecase.ToggleResolvedUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -46,7 +47,7 @@ class TimelineViewModel @Inject constructor(
     private val filterState = MutableStateFlow(MemoryFilter())
     private val sheetState = MutableStateFlow(false)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val uiState: StateFlow<TimelineUiState> = combine(
         filterState.debounce { if (it.query.isBlank()) 0L else 220L }
             .flatMapLatest { filter -> observeMemories(filter) },

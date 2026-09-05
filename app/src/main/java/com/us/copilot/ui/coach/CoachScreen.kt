@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -104,7 +104,7 @@ fun CoachScreen(
                         enabled = state.hasInput && !state.isBusy,
                         modifier = Modifier.weight(1f),
                     ) {
-                        Icon(Icons.Filled.Send, contentDescription = null)
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = null)
                         Text(
                             stringResource(R.string.coach_analyze),
                             modifier = Modifier.padding(start = 8.dp),

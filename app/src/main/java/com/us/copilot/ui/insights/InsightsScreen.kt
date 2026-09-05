@@ -12,7 +12,7 @@ import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.PendingActions
 import androidx.compose.material.icons.outlined.Insights
 import androidx.compose.material3.Icon
@@ -87,7 +87,7 @@ fun InsightsScreen(
                         MetricTile(
                             label = stringResource(R.string.insights_total),
                             value = state.summary.totalMemories.toString(),
-                            icon = Icons.Filled.Notes,
+                            icon = Icons.AutoMirrored.Filled.Notes,
                             modifier = Modifier.weight(1f),
                         )
                         MetricTile(

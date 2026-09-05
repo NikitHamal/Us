@@ -202,6 +202,13 @@ workflow; tests and the file-size guard run inside this same job before the APK 
 - **2026-09-05** — Initial end‑to‑end implementation of all modules A–D, CI/CD, privacy layer.
 - **2026-09-05** — Workflow activated at `.github/workflows/release.yml`; triggers on any branch,
   path-filtered to app/gradle/scripts changes. Separate `ci.yml` removed — one workflow only.
+- **2026-09-05** — Fixed R8 minify failure: `androidx.security:security-crypto` pulls in Tink,
+  which references Error Prone annotations that are compile-time only. Added `-dontwarn` for
+  `com.google.errorprone.annotations.**` plus Tink keep rules. Also added keep rules for
+  serialized enums (`values()`/`valueOf()` are needed to decode cloud responses) and for
+  WorkManager workers, which are instantiated reflectively. Cleared all four compiler warnings:
+  AutoMirrored `Send`/`Notes` icons, `@OptIn(ExperimentalSerializationApi)` for `explicitNulls`,
+  and `@OptIn(FlowPreview)` for `debounce {}`.
 - **2026-09-05** — Fixed release compile errors: `ScaleSlider` was being called with a trailing
   lambda, which Kotlin bound to the last parameter (`valueLabels`) instead of `onValueChange`. The
   five OCEAN sliders are now one shared `BigFiveSliders` composable using named arguments, so the
