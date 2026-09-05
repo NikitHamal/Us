@@ -25,9 +25,15 @@ data class MainUiState(
     val dynamicColor: Boolean = false,
     val lockEnabled: Boolean = false,
     val isUnlocked: Boolean = false,
+    val isAuthenticating: Boolean = false,
+    /** Set when the last unlock attempt failed, so the lock screen can explain itself. */
+    val lockMessage: LockMessage? = null,
 ) {
     val showLockScreen: Boolean get() = lockEnabled && !isUnlocked
 }
+
+/** Why the app is still locked. Resolved to copy in the UI layer. */
+enum class LockMessage { CANCELLED, FAILED, NO_HARDWARE, NOT_ENROLLED }
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -60,18 +66,42 @@ class MainViewModel @Inject constructor(
     }
 
     fun unlock(activity: FragmentActivity) {
+        if (_uiState.value.isAuthenticating) return
+        _uiState.update { it.copy(isAuthenticating = true, lockMessage = null) }
+
         viewModelScope.launch {
-            val granted = BiometricGate.authenticate(
+            val result = BiometricGate.authenticate(
                 activity = activity,
                 title = activity.getString(R.string.lock_prompt_title),
                 subtitle = activity.getString(R.string.lock_prompt_subtitle),
             )
-            if (granted) _uiState.update { it.copy(isUnlocked = true) }
+            _uiState.update { state ->
+                when (result) {
+                    is BiometricGate.Result.Success ->
+                        state.copy(isUnlocked = true, isAuthenticating = false, lockMessage = null)
+
+                    is BiometricGate.Result.Cancelled ->
+                        state.copy(isAuthenticating = false, lockMessage = LockMessage.CANCELLED)
+
+                    is BiometricGate.Result.Error ->
+                        state.copy(isAuthenticating = false, lockMessage = LockMessage.FAILED)
+
+                    is BiometricGate.Result.Unavailable -> state.copy(
+                        isAuthenticating = false,
+                        lockMessage = when (result.reason) {
+                            BiometricGate.Availability.NOT_ENROLLED -> LockMessage.NOT_ENROLLED
+                            else -> LockMessage.NO_HARDWARE
+                        },
+                    )
+                }
+            }
         }
     }
 
     /** Re-lock as soon as the app leaves the foreground. */
     fun onAppBackgrounded() {
-        if (_uiState.value.lockEnabled) _uiState.update { it.copy(isUnlocked = false) }
+        if (_uiState.value.lockEnabled) {
+            _uiState.update { it.copy(isUnlocked = false, lockMessage = null) }
+        }
     }
 }

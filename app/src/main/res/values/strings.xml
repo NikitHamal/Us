@@ -248,6 +248,10 @@
     <string name="lock_body">Unlock to see your profiles and moments.</string>
     <string name="lock_prompt_title">Unlock Us</string>
     <string name="lock_prompt_subtitle">Your relationship notes are private.</string>
+    <string name="lock_cancelled">Unlock cancelled. Tap to try again.</string>
+    <string name="lock_failed">That did not work. Tap to try again.</string>
+    <string name="lock_not_enrolled">No screen lock is set up on this device. Add a PIN, pattern or fingerprint in system settings to use app lock.</string>
+    <string name="lock_no_hardware">This device cannot authenticate you right now.</string>
     <string name="lock_unlock">Unlock</string>
 
     <!-- Errors -->

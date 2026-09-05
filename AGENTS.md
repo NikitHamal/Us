@@ -202,6 +202,26 @@ workflow; tests and the file-size guard run inside this same job before the APK 
 - **2026-09-05** — Initial end‑to‑end implementation of all modules A–D, CI/CD, privacy layer.
 - **2026-09-05** — Workflow activated at `.github/workflows/release.yml`; triggers on any branch,
   path-filtered to app/gradle/scripts changes. Separate `ci.yml` removed — one workflow only.
+- **2026-09-05** — Notification capture, agentic AI, onboarding art, app-lock hardening.
+  **Capture**: new `captured_notifications` table (schema v2, real migration — destructive
+  fallback stays off because journals cannot be recreated). The watch list is chosen by the
+  user from installed launchable apps via a `<queries>` manifest declaration rather than
+  `QUERY_ALL_PACKAGES`, and starts empty, so enabling capture alone captures nothing.
+  Entries store `sharedWithAi = false`; handing text to a model is a separate per-entry
+  action. History screen supports filter, per-row share/delete, stop-sharing-all and
+  clear-all, with retention capped at 500.
+  **Agent**: `ai/agent` adds a tool contract and seven tools (six read, one write).
+  `CloudAgentRunner` runs a real multi-turn tool-calling loop capped at six iterations;
+  `OfflineAgentRunner` executes the same tools on a deterministic keyword plan and is
+  read-only — it is grounded retrieval, not autonomy, because the bundled `.cact` model
+  cannot tool-call. `read_shared_notifications` is structurally unable to see unshared
+  captures. Replies expose the tool trail.
+  **Onboarding**: Compose-drawn animated illustrations, animated progress, section labels.
+  **Fixes**: 'Today' tab was dead (popUpTo targeted the popped ONBOARDING start
+  destination); 'Not sure yet' was unselectable (`takeIf { it != UNKNOWN }` nulled it);
+  theme selector and radio labels overflowed; **BiometricGate returned success when no
+  authenticator was enrolled, silently unlocking a locked app** — it now reports typed
+  states and the lock screen explains them.
 - **2026-09-05** — UI/UX overhaul. Design system now derives from the launcher icon
   (rose `#8F4A5C`, blush `#FFD9E0`) rather than drifting from it; added `UsGradients`
   and `BrandHero`/`QuietGroup`/`BrandBackdrop`. Typography moved to **Poppins** via the

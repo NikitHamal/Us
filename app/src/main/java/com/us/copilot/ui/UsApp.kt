@@ -34,7 +34,12 @@ fun UsApp(
     modifier: Modifier = Modifier,
 ) {
     if (state.showLockScreen) {
-        LockScreen(onUnlock = onUnlockRequested, modifier = modifier)
+        LockScreen(
+            onUnlock = onUnlockRequested,
+            modifier = modifier,
+            isAuthenticating = state.isAuthenticating,
+            message = state.lockMessage,
+        )
         return
     }
 
