@@ -11,5 +11,3 @@ local.properties
 artifacts/
 *.hprof
 
-# Untracked: the agent's token cannot push .github/workflows. Rename dot-github/ instead.
-.github/
