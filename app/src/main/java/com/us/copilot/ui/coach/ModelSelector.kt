@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.us.copilot.R
 import com.us.copilot.ai.nebians.NebiansCatalog
-import com.us.copilot.ai.nebians.NebiansProvider
+import com.us.copilot.ai.nebians.NebiansProviderSpec
 import com.us.copilot.ai.nebians.ReasoningSupport
 import com.us.copilot.domain.repository.NebiansConfig
 import com.us.copilot.domain.repository.NebiansEffort
@@ -166,7 +166,7 @@ fun NebiansProviderList(
 /** Model radio list for one provider, shared by the coach sheet and Settings. */
 @Composable
 fun NebiansModelList(
-    provider: NebiansProvider,
+    provider: NebiansProviderSpec,
     selectedModelId: String,
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -185,7 +185,7 @@ fun NebiansModelList(
 }
 
 @Composable
-private fun ProviderRow(provider: NebiansProvider, selected: Boolean, onClick: () -> Unit) {
+private fun ProviderRow(provider: NebiansProviderSpec, selected: Boolean, onClick: () -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -243,7 +243,7 @@ private fun ModelRow(label: String, note: String, selected: Boolean, onClick: ()
 @Composable
 fun ReasoningControls(
     config: NebiansConfig,
-    provider: NebiansProvider,
+    provider: NebiansProviderSpec,
     onSelectEffort: (NebiansEffort) -> Unit,
     onSelectTemperature: (Float) -> Unit,
     onSelectMaxTokens: (Int) -> Unit,
@@ -296,7 +296,7 @@ fun ReasoningControls(
 private val MaxTokenOptions = listOf(256, 512, 900, 1500, 2500)
 
 @Composable
-private fun CapabilityNote(provider: NebiansProvider) {
+private fun CapabilityNote(provider: NebiansProviderSpec) {
     val bits = buildList {
         if (provider.supportsFiles) add(stringResource(R.string.coach_model_cap_files))
         if (provider.models.any { it.thinking }) add(stringResource(R.string.coach_model_cap_thinking))

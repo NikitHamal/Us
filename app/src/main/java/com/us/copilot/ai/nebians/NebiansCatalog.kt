@@ -36,7 +36,7 @@ data class NebiansModel(
 )
 
 /** One provider entry: endpoint, auth, models and what the UI may offer. */
-data class NebiansProvider(
+data class NebiansProviderSpec(
     val slug: String,
     val label: String,
     val format: NebiansWireFormat,
@@ -81,8 +81,8 @@ private fun m(
 
 object NebiansCatalog {
 
-    val providers: List<NebiansProvider> = listOf(
-        NebiansProvider(
+    val providers: List<NebiansProviderSpec> = listOf(
+        NebiansProviderSpec(
             slug = "tryingopen",
             label = "TryingOpen (free · 16 models)",
             format = NebiansWireFormat.TRYING_OPEN,
@@ -112,7 +112,7 @@ object NebiansCatalog {
             reasoning = ReasoningSupport.EFFORT,
             supportsFiles = true,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "llm7",
             label = "LLM7 (free · anonymous)",
             format = NebiansWireFormat.OPENAI,
@@ -128,7 +128,7 @@ object NebiansCatalog {
             freeNote = "Anonymous: 10/min, 60/hr — no key needed",
             reasoning = ReasoningSupport.TEMPERATURE,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "kilo",
             label = "Kilo Gateway (free :free models)",
             format = NebiansWireFormat.OPENAI,
@@ -146,7 +146,7 @@ object NebiansCatalog {
             freeNote = "Anonymous: 200/hr per IP — no key needed",
             reasoning = ReasoningSupport.TEMPERATURE,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "zen",
             label = "OpenCode Zen (free -free models)",
             format = NebiansWireFormat.OPENAI,
@@ -167,7 +167,7 @@ object NebiansCatalog {
             freeNote = "Anonymous shared pool — retries advised",
             reasoning = ReasoningSupport.TEMPERATURE,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "k2think",
             label = "K2 Horizon (free · reasoning)",
             format = NebiansWireFormat.K2THINK,
@@ -180,7 +180,7 @@ object NebiansCatalog {
             maxOutputTokens = 8_192,
             freeNote = "Free guest chat — no key needed",
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "poolside",
             label = "Poolside (free · code)",
             format = NebiansWireFormat.POOLSIDE,
@@ -194,7 +194,7 @@ object NebiansCatalog {
             maxOutputTokens = 8_192,
             freeNote = "Free guest chat — no key needed",
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "motiftech",
             label = "Motif (free)",
             format = NebiansWireFormat.MOTIF,
@@ -210,7 +210,7 @@ object NebiansCatalog {
             maxOutputTokens = 8_192,
             freeNote = "Free guest chat — no key needed",
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "yqcloud",
             label = "Yqcloud (free · web search)",
             format = NebiansWireFormat.YQCLOUD,
@@ -223,7 +223,7 @@ object NebiansCatalog {
             maxOutputTokens = 4_000,
             freeNote = "Free, no login",
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "chatjimmy",
             label = "ChatJimmy (free · Llama 3.1 8B)",
             format = NebiansWireFormat.CHATJIMMY,
@@ -236,7 +236,7 @@ object NebiansCatalog {
             maxOutputTokens = 4_000,
             freeNote = "Free, no login",
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "agnes",
             label = "Agnes (Sapiens AI)",
             format = NebiansWireFormat.OPENAI,
@@ -252,7 +252,7 @@ object NebiansCatalog {
             reasoning = ReasoningSupport.TEMPERATURE,
             supportsFiles = true,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "openai",
             label = "OpenAI (ChatGPT)",
             format = NebiansWireFormat.OPENAI,
@@ -272,7 +272,7 @@ object NebiansCatalog {
             reasoning = ReasoningSupport.TEMPERATURE,
             supportsFiles = true,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "anthropic",
             label = "Anthropic (Claude)",
             format = NebiansWireFormat.ANTHROPIC,
@@ -288,7 +288,7 @@ object NebiansCatalog {
             keyRequired = true,
             reasoning = ReasoningSupport.TEMPERATURE,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "gemini",
             label = "Google Gemini",
             format = NebiansWireFormat.GEMINI,
@@ -304,7 +304,7 @@ object NebiansCatalog {
             keyRequired = true,
             reasoning = ReasoningSupport.TEMPERATURE,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "deepseek",
             label = "DeepSeek",
             format = NebiansWireFormat.OPENAI,
@@ -318,7 +318,7 @@ object NebiansCatalog {
             keyRequired = true,
             reasoning = ReasoningSupport.TEMPERATURE,
         ),
-        NebiansProvider(
+        NebiansProviderSpec(
             slug = "custom",
             label = "Custom endpoint",
             format = NebiansWireFormat.OPENAI,
@@ -332,7 +332,7 @@ object NebiansCatalog {
         ),
     )
 
-    fun find(slug: String): NebiansProvider? =
+    fun find(slug: String): NebiansProviderSpec? =
         providers.firstOrNull { it.slug == slug.trim().lowercase() }
 
     fun modelFor(slug: String, modelId: String): NebiansModel? {
@@ -349,5 +349,5 @@ object NebiansCatalog {
     }
 
     /** Providers that work with zero configuration — the offline-first default. */
-    fun freeProviders(): List<NebiansProvider> = providers.filter { !it.keyRequired }
+    fun freeProviders(): List<NebiansProviderSpec> = providers.filter { !it.keyRequired }
 }

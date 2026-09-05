@@ -40,7 +40,7 @@ class GuestScraperClients @Inject constructor(
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     suspend fun chat(
-        provider: NebiansProvider,
+        provider: NebiansProviderSpec,
         model: String,
         messages: List<NebiansMessage>,
     ): NebiansChatResult = when (provider.format) {

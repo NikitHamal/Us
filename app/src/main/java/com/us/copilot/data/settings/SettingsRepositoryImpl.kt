@@ -119,7 +119,7 @@ class SettingsRepositoryImpl @Inject constructor(
         credentialsState.value = CloudCredentials()
     }
 
-    override suspend fun nebiansConfigSnapshot(): NebiansConfig = first(nebiansConfig)
+    override suspend fun nebiansConfigSnapshot(): NebiansConfig = nebiansConfig.first()
 
     override suspend fun setNebiansProvider(slug: String) {
         context.settingsDataStore.edit { it[Keys.nebiansProvider] = slug.trim().lowercase() }

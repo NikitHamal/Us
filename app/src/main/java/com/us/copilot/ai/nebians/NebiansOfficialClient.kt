@@ -38,7 +38,7 @@ class NebiansOfficialClient @Inject constructor(
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
 
     suspend fun chat(
-        provider: NebiansProvider,
+        provider: NebiansProviderSpec,
         model: String,
         messages: List<NebiansMessage>,
         apiKey: String,
@@ -62,7 +62,7 @@ class NebiansOfficialClient @Inject constructor(
     // --- OpenAI-compatible -------------------------------------------------
 
     private suspend fun openAiChat(
-        provider: NebiansProvider,
+        provider: NebiansProviderSpec,
         baseUrl: String,
         apiKey: String,
         model: String,
@@ -131,7 +131,7 @@ class NebiansOfficialClient @Inject constructor(
         }
     }
 
-    private fun openAiHeaders(apiKey: String, provider: NebiansProvider): Map<String, String> {
+    private fun openAiHeaders(apiKey: String, provider: NebiansProviderSpec): Map<String, String> {
         val headers = mutableMapOf<String, String>()
         headers.putAll(provider.extraHeaders)
         val effective = apiKey.trim().ifBlank { provider.defaultKey }

@@ -213,12 +213,14 @@ object AgentProtocol {
         return null
     }
 
-    private fun decodeJsonObject(text: String): Map<String, Any?>? = try {
-        val element = jsonLenient.parseToJsonElement(text)
-        if (element !is JsonObject) return null
-        element.mapValues { (_, value) -> jsonValue(value) }
-    } catch (e: IllegalArgumentException) {
-        null
+    private fun decodeJsonObject(text: String): Map<String, Any?>? {
+        return try {
+            val element = jsonLenient.parseToJsonElement(text)
+            if (element !is JsonObject) null
+            else element.mapValues { (_, value) -> jsonValue(value) }
+        } catch (e: IllegalArgumentException) {
+            null
+        }
     }
 
     private fun jsonValue(element: kotlinx.serialization.json.JsonElement): Any? = when (element) {
