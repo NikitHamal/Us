@@ -117,7 +117,11 @@ fun <T> RadioOptionList(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(selected = isSelected, onClick = null)
-                    Column(Modifier.padding(start = 8.dp)) {
+                    Column(
+                        Modifier
+                            .weight(1f)
+                            .padding(start = 8.dp),
+                    ) {
                         Text(label(option), style = MaterialTheme.typography.titleSmall)
                         description(option)?.let {
                             Text(

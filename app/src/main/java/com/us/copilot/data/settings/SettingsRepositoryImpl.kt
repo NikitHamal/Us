@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.us.copilot.ai.CloudEnabledSource
 import com.us.copilot.data.local.crypto.SecureStore
@@ -45,6 +46,8 @@ class SettingsRepositoryImpl @Inject constructor(
         val themeMode = stringPreferencesKey("theme_mode")
         val partnerConsent = booleanPreferencesKey("partner_consent")
         val lastInsightRefresh = longPreferencesKey("last_insight_refresh")
+        val watchedPackages = stringSetPreferencesKey("watched_packages")
+        val notificationToneCheck = booleanPreferencesKey("notification_tone_check")
     }
 
     private val credentialsState = MutableStateFlow(readCredentials())
@@ -56,6 +59,8 @@ class SettingsRepositoryImpl @Inject constructor(
                 biometricLockEnabled = prefs[Keys.biometric] ?: false,
                 cloudAiEnabled = prefs[Keys.cloudAi] ?: false,
                 notificationCaptureEnabled = prefs[Keys.notificationCapture] ?: false,
+                watchedPackages = prefs[Keys.watchedPackages] ?: emptySet(),
+                notificationToneCheckEnabled = prefs[Keys.notificationToneCheck] ?: false,
                 dynamicColorEnabled = prefs[Keys.dynamicColor] ?: false,
                 themeMode = prefs[Keys.themeMode]
                     ?.let { name -> ThemeMode.entries.firstOrNull { it.name == name } }
@@ -95,6 +100,12 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setBiometricLock(enabled: Boolean) = write(Keys.biometric, enabled)
     override suspend fun setCloudAi(enabled: Boolean) = write(Keys.cloudAi, enabled)
     override suspend fun setNotificationCapture(enabled: Boolean) = write(Keys.notificationCapture, enabled)
+
+    override suspend fun setWatchedPackages(packages: Set<String>) =
+        write(Keys.watchedPackages, packages)
+
+    override suspend fun setNotificationToneCheck(enabled: Boolean) =
+        write(Keys.notificationToneCheck, enabled)
     override suspend fun setDynamicColor(enabled: Boolean) = write(Keys.dynamicColor, enabled)
     override suspend fun setPartnerConsent(recorded: Boolean) = write(Keys.partnerConsent, recorded)
 
@@ -106,7 +117,7 @@ class SettingsRepositoryImpl @Inject constructor(
         context.settingsDataStore.edit { it[Keys.lastInsightRefresh] = timestamp }
     }
 
-    private suspend fun write(key: Preferences.Key<Boolean>, value: Boolean) {
+    private suspend fun <T> write(key: Preferences.Key<T>, value: T) {
         context.settingsDataStore.edit { it[key] = value }
     }
 

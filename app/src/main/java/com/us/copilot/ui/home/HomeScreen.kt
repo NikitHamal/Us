@@ -80,8 +80,20 @@ fun HomeScreen(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 actions = {
+                    // Coach sits immediately before Settings: it is the most-used action, and
+                    // keeping it in the app bar frees the bottom nav for the three places you
+                    // browse rather than the one task you perform.
+                    IconButton(onClick = onOpenCoach) {
+                        Icon(
+                            Icons.Filled.AutoAwesome,
+                            contentDescription = stringResource(R.string.nav_coach),
+                        )
+                    }
                     IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
+                        Icon(
+                            Icons.Filled.Settings,
+                            contentDescription = stringResource(R.string.nav_settings),
+                        )
                     }
                 },
             )

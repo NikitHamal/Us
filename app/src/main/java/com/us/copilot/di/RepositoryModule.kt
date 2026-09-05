@@ -3,10 +3,12 @@ package com.us.copilot.di
 import com.us.copilot.ai.CloudEnabledSource
 import com.us.copilot.data.repository.CheckInRepositoryImpl
 import com.us.copilot.data.repository.MemoryRepositoryImpl
+import com.us.copilot.data.repository.NotificationRepositoryImpl
 import com.us.copilot.data.repository.ProfileRepositoryImpl
 import com.us.copilot.data.settings.SettingsRepositoryImpl
 import com.us.copilot.domain.repository.CheckInRepository
 import com.us.copilot.domain.repository.MemoryRepository
+import com.us.copilot.domain.repository.NotificationRepository
 import com.us.copilot.domain.repository.ProfileRepository
 import com.us.copilot.domain.repository.SettingsRepository
 import dagger.Binds
@@ -27,6 +29,11 @@ abstract class RepositoryModule {
 
     @Binds @Singleton
     abstract fun bindCheckInRepository(impl: CheckInRepositoryImpl): CheckInRepository
+
+    @Binds @Singleton
+    abstract fun bindNotificationRepository(
+        impl: NotificationRepositoryImpl,
+    ): NotificationRepository
 
     @Binds @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository

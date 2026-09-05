@@ -30,6 +30,13 @@ data class AppPreferences(
     val analyticsOptIn: Boolean = false,
     val partnerConsentRecorded: Boolean = false,
     val lastInsightRefresh: Long = 0L,
+    /**
+     * Packages the notification listener is allowed to read. Empty by default — enabling capture
+     * does nothing until the user picks apps, so there is no implicit surveillance.
+     */
+    val watchedPackages: Set<String> = emptySet(),
+    /** When true, newly captured notifications get an on-device tone read. Never uploads. */
+    val notificationToneCheckEnabled: Boolean = false,
 )
 
 enum class ThemeMode(val label: String) { SYSTEM("Follow system"), LIGHT("Light"), DARK("Dark") }
@@ -47,6 +54,8 @@ interface SettingsRepository {
     suspend fun setBiometricLock(enabled: Boolean)
     suspend fun setCloudAi(enabled: Boolean)
     suspend fun setNotificationCapture(enabled: Boolean)
+    suspend fun setWatchedPackages(packages: Set<String>)
+    suspend fun setNotificationToneCheck(enabled: Boolean)
     suspend fun setDynamicColor(enabled: Boolean)
     suspend fun setThemeMode(mode: ThemeMode)
     suspend fun setPartnerConsent(recorded: Boolean)

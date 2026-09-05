@@ -16,6 +16,8 @@ import androidx.navigation.navArgument
 import com.us.copilot.core.model.ProfileOwner
 import com.us.copilot.ui.coach.CoachScreen
 import com.us.copilot.ui.insights.InsightsScreen
+import com.us.copilot.ui.notifications.NotificationHistoryScreen
+import com.us.copilot.ui.notifications.WatchedAppsScreen
 import com.us.copilot.ui.journal.CheckInScreen
 import com.us.copilot.ui.journal.JournalScreen
 import com.us.copilot.ui.home.HomeScreen
@@ -82,7 +84,21 @@ fun UsNavHost(
         }
 
         composable(Routes.COACH) {
-            CoachScreen(contentPadding = contentPadding)
+            CoachScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.NOTIFICATION_HISTORY) {
+            NotificationHistoryScreen(
+                contentPadding = contentPadding,
+                onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(Routes.WATCHED_APPS) {
+            WatchedAppsScreen(
+                contentPadding = contentPadding,
+                onBack = { navController.popBackStack() },
+            )
         }
 
         composable(Routes.INSIGHTS) {
@@ -142,6 +158,10 @@ fun UsNavHost(
             SettingsScreen(
                 contentPadding = contentPadding,
                 onBack = { navController.popBackStack() },
+                onOpenWatchedApps = { navController.navigate(Routes.WATCHED_APPS) },
+                onOpenNotificationHistory = {
+                    navController.navigate(Routes.NOTIFICATION_HISTORY)
+                },
             )
         }
     }

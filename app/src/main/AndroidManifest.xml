@@ -8,6 +8,19 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!--
+      Package visibility (Android 11+). We deliberately do NOT request QUERY_ALL_PACKAGES:
+      it is a sensitive permission and Play Store review treats it as high risk. Declaring the
+      launcher intent instead lets us list only apps the user can actually launch, which is
+      exactly the set worth offering in the notification watch-list picker.
+    -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:name=".UsApplication"
         android:allowBackup="false"

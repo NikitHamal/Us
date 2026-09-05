@@ -71,6 +71,9 @@ class SettingsViewModel @Inject constructor(
     fun setBiometric(enabled: Boolean) = launchSetting { settings.setBiometricLock(enabled) }
     fun setCloudAi(enabled: Boolean) = launchSetting { settings.setCloudAi(enabled) }
     fun setNotificationCapture(enabled: Boolean) = launchSetting { settings.setNotificationCapture(enabled) }
+
+    fun setNotificationToneCheck(enabled: Boolean) =
+        launchSetting { settings.setNotificationToneCheck(enabled) }
     fun setDynamicColor(enabled: Boolean) = launchSetting { settings.setDynamicColor(enabled) }
     fun setThemeMode(mode: ThemeMode) = launchSetting { settings.setThemeMode(mode) }
 

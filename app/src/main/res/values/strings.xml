@@ -18,6 +18,7 @@
     <string name="action_done">Done</string>
     <string name="action_retry">Try again</string>
     <string name="action_delete">Delete</string>
+    <string name="action_clear">Clear</string>
     <string name="action_edit">Edit</string>
     <string name="action_copy">Copy</string>
     <string name="copied_to_clipboard">Copied</string>
@@ -258,4 +259,37 @@
     <string name="cd_unresolved">Unresolved moment</string>
     <string name="cd_risk_level">Risk level: %1$s</string>
     <string name="cd_provider_badge">Answered by %1$s</string>
+
+    <!-- Notification capture -->
+    <string name="notif_history_title">Notification history</string>
+    <string name="notif_history_summary">%1$d captured · %2$d shared with the coach</string>
+    <string name="notif_history_empty_title">Nothing captured yet</string>
+    <string name="notif_history_empty_body">Messages from the apps you watch will appear here.</string>
+    <string name="notif_history_empty_disabled">Notification capture is off. Turn it on in Settings to start keeping a local history.</string>
+    <string name="notif_history_empty_no_apps">Capture is on, but you have not chosen any apps to watch yet. Pick them in Settings.</string>
+    <string name="notif_filter_all">All</string>
+    <string name="notif_filter_shared">Shared with coach</string>
+    <string name="notif_shared_on">The coach can read this</string>
+    <string name="notif_shared_off">Private to you</string>
+    <string name="notif_toggle_share">Share with the coach</string>
+    <string name="notif_stop_sharing_all">Stop sharing all</string>
+    <string name="notif_clear_all">Clear all</string>
+    <string name="notif_clear_all_title">Clear notification history?</string>
+    <string name="notif_clear_all_body">This permanently deletes every captured notification on this device. It cannot be undone.</string>
+    <string name="notif_clear_all_confirm">Delete everything</string>
+
+    <!-- Watched apps picker -->
+    <string name="notif_apps_title">Apps to watch</string>
+    <string name="notif_apps_body">Only these apps will have their notifications captured. Nothing is captured until you pick at least one.</string>
+    <string name="notif_apps_search">Search apps</string>
+    <string name="notif_apps_selected">%1$d selected</string>
+    <string name="notif_apps_none">No apps selected. Capture is effectively off.</string>
+    <string name="notif_apps_suggested">Messaging</string>
+    <string name="notif_apps_all">All apps</string>
+    <string name="settings_watched_apps">Apps to watch</string>
+    <string name="settings_watched_apps_body">Choose which apps have notifications captured.</string>
+    <string name="settings_notification_history">Notification history</string>
+    <string name="settings_notification_history_body">Review, share, or delete what has been captured.</string>
+    <string name="settings_tone_check">Check tone on capture</string>
+    <string name="settings_tone_check_body">Runs an on-device read of each captured message and nudges you if it looks harsh. Never uploads.</string>
 </resources>

@@ -76,3 +76,33 @@ data class AnalysisEntity(
     val confidence: Float,
     val createdAt: Long,
 )
+
+/**
+ * A notification captured from a watched app.
+ *
+ * Captured text is stored locally and encrypted at rest like everything else. Crucially,
+ * [sharedWithAi] defaults to false: capturing a notification never means the AI has seen it.
+ * The user promotes individual entries to AI context explicitly from the history screen.
+ */
+@Entity(
+    tableName = "captured_notifications",
+    indices = [
+        Index(value = ["postedAt"]),
+        Index(value = ["packageName"]),
+        Index(value = ["fingerprint"], unique = true),
+    ],
+)
+data class CapturedNotificationEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
+    val packageName: String,
+    val appLabel: String,
+    val title: String,
+    val text: String,
+    val postedAt: Long,
+    /** SHA-256 of package + text, used to drop duplicate re-posts of the same notification. */
+    val fingerprint: String,
+    /** Set only when the user explicitly hands this entry to the AI as context. */
+    val sharedWithAi: Boolean = false,
+    /** Populated lazily if the user asks for an on-device tone read. */
+    val riskLevel: String? = null,
+)

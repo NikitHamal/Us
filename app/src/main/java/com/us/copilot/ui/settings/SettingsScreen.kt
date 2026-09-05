@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -22,6 +23,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -34,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,6 +58,8 @@ import com.us.copilot.ui.util.messageFor
 fun SettingsScreen(
     contentPadding: PaddingValues,
     onBack: () -> Unit,
+    onOpenWatchedApps: () -> Unit,
+    onOpenNotificationHistory: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -132,6 +140,29 @@ fun SettingsScreen(
                     onCheckedChange = viewModel::setNotificationCapture,
                 )
                 if (state.prefs.notificationCaptureEnabled) {
+                    SettingsToggle(
+                        title = stringResource(R.string.settings_tone_check),
+                        body = stringResource(R.string.settings_tone_check_body),
+                        checked = state.prefs.notificationToneCheckEnabled,
+                        onCheckedChange = viewModel::setNotificationToneCheck,
+                    )
+                    SettingsLink(
+                        title = stringResource(R.string.settings_watched_apps),
+                        body = if (state.prefs.watchedPackages.isEmpty()) {
+                            stringResource(R.string.notif_apps_none)
+                        } else {
+                            stringResource(
+                                R.string.notif_apps_selected,
+                                state.prefs.watchedPackages.size,
+                            )
+                        },
+                        onClick = onOpenWatchedApps,
+                    )
+                    SettingsLink(
+                        title = stringResource(R.string.settings_notification_history),
+                        body = stringResource(R.string.settings_notification_history_body),
+                        onClick = onOpenNotificationHistory,
+                    )
                     OutlinedButton(
                         onClick = {
                             context.startActivity(
@@ -159,13 +190,22 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.padding(top = 12.dp, bottom = 6.dp),
                 )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ThemeMode.entries.forEach { mode ->
-                        FilterChip(
+                SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
+                    ThemeMode.entries.forEachIndexed { index, mode ->
+                        SegmentedButton(
                             selected = state.prefs.themeMode == mode,
                             onClick = { viewModel.setThemeMode(mode) },
-                            label = { Text(mode.label) },
-                            shape = UsShapes.small,
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = ThemeMode.entries.size,
+                            ),
+                            label = {
+                                Text(
+                                    mode.label,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
                         )
                     }
                 }
@@ -310,6 +350,40 @@ private fun AiProviderCard(
                 )
                 else -> Unit
             }
+        }
+    }
+}
+
+/** Row that navigates elsewhere. Text column is weighted so long bodies wrap instead of clipping. */
+@Composable
+private fun SettingsLink(
+    title: String,
+    body: String,
+    onClick: () -> Unit,
+) {
+    Surface(
+        onClick = onClick,
+        shape = UsShapes.medium,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+    ) {
+        Row(
+            Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(title, style = MaterialTheme.typography.titleSmall)
+                Text(
+                    body,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

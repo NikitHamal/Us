@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BookmarkAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -55,7 +56,7 @@ import com.us.copilot.ui.util.messageFor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoachScreen(
-    contentPadding: PaddingValues,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
     prefillText: String? = null,
     viewModel: CoachViewModel = hiltViewModel(),
@@ -87,6 +88,14 @@ fun CoachScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.coach_title)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back),
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -120,7 +129,7 @@ fun CoachScreen(
                     listState = listState,
                     onUseRewrite = viewModel::useRewrite,
                     onRetry = viewModel::retry,
-                    bottomInset = contentPadding.calculateBottomPadding(),
+                    bottomInset = 0.dp,
                 )
             }
 
@@ -133,7 +142,7 @@ fun CoachScreen(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(horizontal = 12.dp)
-                    .padding(bottom = contentPadding.calculateBottomPadding() + 8.dp)
+                    .padding(bottom = 8.dp)
                     .navigationBarsPadding()
                     .imePadding(),
             )

@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.us.copilot.ui.navigation.Routes
@@ -105,9 +104,17 @@ fun UsApp(
     }
 }
 
+/**
+ * Tapping a bottom-nav item.
+ *
+ * Anchors the back stack to HOME rather than `graph.findStartDestination()`. The graph's start
+ * destination is ONBOARDING on a first run, and once onboarding finishes it is popped off the
+ * stack entirely — so popping up to it matched nothing and left "Today" looking dead on tap.
+ * HOME is the real hub of the app and is always present, so it is the correct anchor.
+ */
 private fun androidx.navigation.NavHostController.navigateToTopLevel(route: String) {
     navigate(route) {
-        popUpTo(graph.findStartDestination().id) { saveState = true }
+        popUpTo(Routes.HOME) { saveState = true }
         launchSingleTop = true
         restoreState = true
     }

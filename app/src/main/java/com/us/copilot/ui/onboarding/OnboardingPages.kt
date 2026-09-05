@@ -66,7 +66,7 @@ fun OnboardingPageContent(
             ) {
                 RadioOptionList(
                     options = AttachmentStyle.entries,
-                    selected = profile.attachmentStyle.takeIf { it != AttachmentStyle.UNKNOWN },
+                    selected = profile.attachmentStyle,
                     label = { it.label },
                     description = { it.blurb },
                     onSelect = viewModel::updateAttachment,
@@ -89,7 +89,7 @@ fun OnboardingPageContent(
             ) {
                 RadioOptionList(
                     options = ConflictStyle.entries,
-                    selected = profile.conflictStyle.takeIf { it != ConflictStyle.UNKNOWN },
+                    selected = profile.conflictStyle,
                     label = { it.label },
                     description = { it.blurb },
                     onSelect = viewModel::updateConflict,

@@ -2,11 +2,9 @@ package com.us.copilot.ui.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Insights
-import androidx.compose.material.icons.outlined.AutoAwesome
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Insights
@@ -27,12 +25,20 @@ object Routes {
     const val PROFILE_EDIT = "profile/edit/{owner}"
     const val MEMORY_DETAIL = "memory/{memoryId}"
     const val CHECK_IN = "check_in"
+    const val NOTIFICATION_HISTORY = "notifications"
+    const val WATCHED_APPS = "notifications/apps"
 
     fun profileEdit(owner: String) = "profile/edit/$owner"
     fun memoryDetail(id: Long) = "memory/$id"
 }
 
-/** Bottom navigation entries. */
+/**
+ * Bottom navigation entries — deliberately three.
+ *
+ * Coach is intentionally absent: it is a focused, full-screen task with its own keyboard and
+ * transcript, so it is reached from Today's app bar and pushed as a standalone destination
+ * rather than living behind a tab that keeps the nav bar overlapping its composer.
+ */
 enum class TopLevelDestination(
     val route: String,
     @StringRes val labelRes: Int,
@@ -41,6 +47,5 @@ enum class TopLevelDestination(
 ) {
     HOME(Routes.HOME, R.string.nav_home, Icons.Filled.Favorite, Icons.Outlined.FavoriteBorder),
     TIMELINE(Routes.TIMELINE, R.string.nav_timeline, Icons.Filled.Book, Icons.Outlined.Book),
-    COACH(Routes.COACH, R.string.nav_coach, Icons.Filled.AutoAwesome, Icons.Outlined.AutoAwesome),
     INSIGHTS(Routes.INSIGHTS, R.string.nav_insights, Icons.Filled.Insights, Icons.Outlined.Insights),
 }

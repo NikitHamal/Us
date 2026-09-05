@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import com.us.copilot.data.local.crypto.DatabaseKeyProvider
 import com.us.copilot.data.local.dao.AnalysisDao
+import com.us.copilot.data.local.dao.CapturedNotificationDao
 import com.us.copilot.data.local.dao.CheckInDao
 import com.us.copilot.data.local.dao.MemoryDao
 import com.us.copilot.data.local.dao.ProfileDao
+import com.us.copilot.data.local.db.Migrations
 import com.us.copilot.data.local.db.UsDatabase
 import dagger.Module
 import dagger.Provides
@@ -31,6 +33,7 @@ object DatabaseModule {
         val factory = SupportFactory(keyProvider.passphraseBytes(), null, false)
         return Room.databaseBuilder(context, UsDatabase::class.java, UsDatabase.NAME)
             .openHelperFactory(factory)
+            .addMigrations(*Migrations.ALL)
             .fallbackToDestructiveMigrationOnDowngrade()
             .build()
     }
@@ -39,4 +42,8 @@ object DatabaseModule {
     @Provides fun provideMemoryDao(db: UsDatabase): MemoryDao = db.memoryDao()
     @Provides fun provideCheckInDao(db: UsDatabase): CheckInDao = db.checkInDao()
     @Provides fun provideAnalysisDao(db: UsDatabase): AnalysisDao = db.analysisDao()
+
+    @Provides
+    fun provideCapturedNotificationDao(db: UsDatabase): CapturedNotificationDao =
+        db.capturedNotificationDao()
 }
