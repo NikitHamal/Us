@@ -1,0 +1,119 @@
+package com.us.copilot.data.settings
+
+import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import com.us.copilot.ai.CloudEnabledSource
+import com.us.copilot.data.local.crypto.SecureStore
+import com.us.copilot.domain.repository.AppPreferences
+import com.us.copilot.domain.repository.CloudCredentials
+import com.us.copilot.domain.repository.SettingsRepository
+import com.us.copilot.domain.repository.ThemeMode
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
+
+private val Context.settingsDataStore: DataStore<Preferences> by preferencesDataStore("us_settings")
+
+/**
+ * Two-tier settings:
+ * - non-sensitive toggles → DataStore
+ * - credentials → [SecureStore] (EncryptedSharedPreferences, Keystore-backed)
+ */
+@Singleton
+class SettingsRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val secureStore: SecureStore,
+) : SettingsRepository, CloudEnabledSource {
+
+    private object Keys {
+        val onboarding = booleanPreferencesKey("onboarding_complete")
+        val biometric = booleanPreferencesKey("biometric_lock")
+        val cloudAi = booleanPreferencesKey("cloud_ai_enabled")
+        val notificationCapture = booleanPreferencesKey("notification_capture")
+        val dynamicColor = booleanPreferencesKey("dynamic_color")
+        val themeMode = stringPreferencesKey("theme_mode")
+        val partnerConsent = booleanPreferencesKey("partner_consent")
+        val lastInsightRefresh = longPreferencesKey("last_insight_refresh")
+    }
+
+    private val credentialsState = MutableStateFlow(readCredentials())
+
+    override val preferences: Flow<AppPreferences> =
+        context.settingsDataStore.data.map { prefs ->
+            AppPreferences(
+                onboardingComplete = prefs[Keys.onboarding] ?: false,
+                biometricLockEnabled = prefs[Keys.biometric] ?: false,
+                cloudAiEnabled = prefs[Keys.cloudAi] ?: false,
+                notificationCaptureEnabled = prefs[Keys.notificationCapture] ?: false,
+                dynamicColorEnabled = prefs[Keys.dynamicColor] ?: true,
+                themeMode = prefs[Keys.themeMode]
+                    ?.let { name -> ThemeMode.entries.firstOrNull { it.name == name } }
+                    ?: ThemeMode.SYSTEM,
+                partnerConsentRecorded = prefs[Keys.partnerConsent] ?: false,
+                lastInsightRefresh = prefs[Keys.lastInsightRefresh] ?: 0L,
+            )
+        }.distinctUntilChanged()
+
+    override val cloudEnabled: Flow<Boolean> = preferences.map { it.cloudAiEnabled }.distinctUntilChanged()
+
+    override val enabled: Flow<Boolean> get() = cloudEnabled
+
+    override suspend fun cloudCredentials(): CloudCredentials = readCredentials()
+
+    override fun cloudCredentialsFlow(): Flow<CloudCredentials> = credentialsState.asStateFlow()
+
+    override suspend fun saveCloudCredentials(credentials: CloudCredentials) {
+        secureStore.putString(SecureStore.KEY_BASE_URL, credentials.baseUrl.trim())
+        secureStore.putString(SecureStore.KEY_API_KEY, credentials.apiKey.trim())
+        secureStore.putString(SecureStore.KEY_MODEL_NAME, credentials.modelName.trim())
+        secureStore.putString(SecureStore.KEY_EMBEDDING_MODEL, credentials.embeddingModel.trim())
+        credentialsState.value = readCredentials()
+    }
+
+    override suspend fun clearCloudCredentials() {
+        secureStore.remove(
+            SecureStore.KEY_BASE_URL,
+            SecureStore.KEY_API_KEY,
+            SecureStore.KEY_MODEL_NAME,
+            SecureStore.KEY_EMBEDDING_MODEL,
+        )
+        credentialsState.value = CloudCredentials()
+    }
+
+    override suspend fun setOnboardingComplete(complete: Boolean) = write(Keys.onboarding, complete)
+    override suspend fun setBiometricLock(enabled: Boolean) = write(Keys.biometric, enabled)
+    override suspend fun setCloudAi(enabled: Boolean) = write(Keys.cloudAi, enabled)
+    override suspend fun setNotificationCapture(enabled: Boolean) = write(Keys.notificationCapture, enabled)
+    override suspend fun setDynamicColor(enabled: Boolean) = write(Keys.dynamicColor, enabled)
+    override suspend fun setPartnerConsent(recorded: Boolean) = write(Keys.partnerConsent, recorded)
+
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        context.settingsDataStore.edit { it[Keys.themeMode] = mode.name }
+    }
+
+    override suspend fun setLastInsightRefresh(timestamp: Long) {
+        context.settingsDataStore.edit { it[Keys.lastInsightRefresh] = timestamp }
+    }
+
+    private suspend fun write(key: Preferences.Key<Boolean>, value: Boolean) {
+        context.settingsDataStore.edit { it[key] = value }
+    }
+
+    private fun readCredentials() = CloudCredentials(
+        baseUrl = secureStore.getString(SecureStore.KEY_BASE_URL),
+        apiKey = secureStore.getString(SecureStore.KEY_API_KEY),
+        modelName = secureStore.getString(SecureStore.KEY_MODEL_NAME),
+        embeddingModel = secureStore.getString(SecureStore.KEY_EMBEDDING_MODEL),
+    )
+}

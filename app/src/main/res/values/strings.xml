@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Us</string>
+    <string name="app_tagline">Relationship Co-Pilot</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Today</string>
+    <string name="nav_timeline">Timeline</string>
+    <string name="nav_coach">Coach</string>
+    <string name="nav_insights">Insights</string>
+    <string name="nav_settings">Settings</string>
+    <string name="action_back">Go back</string>
+    <string name="action_close">Close</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_continue">Continue</string>
+    <string name="action_skip">Skip for now</string>
+    <string name="action_done">Done</string>
+    <string name="action_retry">Try again</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_copy">Copy</string>
+    <string name="copied_to_clipboard">Copied</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome_title">Understand her better</string>
+    <string name="onboarding_welcome_body">Us is a private coach for one person: you. It helps you read the moment, repair faster, and say the hard thing kindly.</string>
+    <string name="onboarding_privacy_title">Everything stays on this phone</string>
+    <string name="onboarding_privacy_body">Your notes are stored in an encrypted database only this app can open. Nothing is uploaded unless you switch on cloud AI yourself.</string>
+    <string name="onboarding_ethics_title">A growth tool, not a spy tool</string>
+    <string name="onboarding_ethics_body">Us never reads your chats. You choose what to share into it. It will not help you win an argument, only help you be understood.</string>
+    <string name="onboarding_me_title">First, about you</string>
+    <string name="onboarding_partner_title">Now, about her</string>
+    <string name="onboarding_partner_caveat">This is your understanding of her. It will be wrong sometimes, and you can change it any time.</string>
+    <string name="onboarding_name_label">Name</string>
+    <string name="onboarding_name_hint_me">What should I call you?</string>
+    <string name="onboarding_name_hint_partner">Her name</string>
+    <string name="onboarding_attachment_title">Attachment style</string>
+    <string name="onboarding_attachment_body">How does closeness usually feel?</string>
+    <string name="onboarding_love_title">Love languages</string>
+    <string name="onboarding_love_body">Tap them in order, most important first.</string>
+    <string name="onboarding_conflict_title">In a disagreement</string>
+    <string name="onboarding_conflict_body">What usually happens in the heat of it?</string>
+    <string name="onboarding_triggers_title">Triggers</string>
+    <string name="onboarding_triggers_body">What reliably makes it worse?</string>
+    <string name="onboarding_soothers_title">Soothers</string>
+    <string name="onboarding_soothers_body">What actually helps calm things down?</string>
+    <string name="onboarding_bigfive_title">Personality</string>
+    <string name="onboarding_bigfive_body">A rough sketch is enough. Slide to what feels true.</string>
+    <string name="onboarding_stress_title">Under stress</string>
+    <string name="onboarding_stress_body">What shows up when things get heavy?</string>
+    <string name="onboarding_comm_title">Communication preferences</string>
+    <string name="onboarding_comm_body">The unwritten rules that keep things easy.</string>
+    <string name="onboarding_finish">Finish setup</string>
+    <string name="onboarding_step">Step %1$d of %2$d</string>
+
+    <!-- Home -->
+    <string name="home_greeting_morning">Good morning</string>
+    <string name="home_greeting_afternoon">Good afternoon</string>
+    <string name="home_greeting_evening">Good evening</string>
+    <string name="home_check_in_prompt">How are you two today?</string>
+    <string name="home_check_in_done">Checked in today. Streak: %1$d days</string>
+    <string name="home_quick_actions">Quick actions</string>
+    <string name="home_action_check_message">Check a message</string>
+    <string name="home_action_journal">Write a moment</string>
+    <string name="home_action_repair">Repair starter</string>
+    <string name="home_action_profiles">Profiles</string>
+    <string name="home_recent">Recent moments</string>
+    <string name="home_unresolved">Still open</string>
+    <string name="home_unresolved_body">%1$d moments are waiting for a repair.</string>
+    <string name="home_empty_title">Nothing here yet</string>
+    <string name="home_empty_body">Share a message into Us, or write down one thing that happened today.</string>
+
+    <!-- Timeline -->
+    <string name="timeline_title">Timeline</string>
+    <string name="timeline_search_hint">Search moments</string>
+    <string name="timeline_filter">Filters</string>
+    <string name="timeline_filter_unresolved">Unresolved only</string>
+    <string name="timeline_filter_clear">Clear filters</string>
+    <string name="timeline_empty_title">Your timeline is empty</string>
+    <string name="timeline_empty_body">Every moment you log makes the patterns more honest. Start with today.</string>
+    <string name="timeline_no_results_title">No matches</string>
+    <string name="timeline_no_results_body">Try a different word, or clear your filters.</string>
+    <string name="timeline_mark_resolved">Mark resolved</string>
+    <string name="timeline_mark_unresolved">Reopen</string>
+    <string name="timeline_source">From %1$s</string>
+
+    <!-- Coach -->
+    <string name="coach_title">Communication coach</string>
+    <string name="coach_input_hint">Paste or type what you want to send</string>
+    <string name="coach_analyze">Check before you send</string>
+    <string name="coach_rephrase">Rewrite it kindly</string>
+    <string name="coach_verdict_low">Looks kind. Send it.</string>
+    <string name="coach_verdict_medium">This could sting</string>
+    <string name="coach_verdict_high">This will start a fight</string>
+    <string name="coach_harshness">Harshness</string>
+    <string name="coach_horsemen_found">Four Horsemen detected</string>
+    <string name="coach_horsemen_antidote">Antidote: %1$s</string>
+    <string name="coach_triggers_found">Touches her triggers</string>
+    <string name="coach_options">Three ways to say it</string>
+    <string name="coach_nvc_title">The NVC skeleton</string>
+    <string name="coach_love_tip">Because her love language is %1$s</string>
+    <string name="coach_save_memory">Save as a moment</string>
+    <string name="coach_empty_title">Nothing to check yet</string>
+    <string name="coach_empty_body">Type your draft above, or share a message into Us from Instagram or Messenger.</string>
+    <string name="coach_analyzing">Reading the tone…</string>
+    <string name="coach_provider_offline">Analysed on device</string>
+    <string name="coach_provider_cloud">Analysed by your cloud model</string>
+
+    <!-- Share -->
+    <string name="share_title">Shared into Us</string>
+    <string name="share_body">What do you want to do with this?</string>
+    <string name="share_action_analyze">Check the tone</string>
+    <string name="share_action_save">Save as a moment</string>
+    <string name="share_saved">Saved to your timeline</string>
+    <string name="share_who_said">Who said this?</string>
+    <string name="share_empty">That share did not contain any text.</string>
+
+    <!-- Journal & check-in -->
+    <string name="journal_title">Journal</string>
+    <string name="journal_hint">What happened, and how did it land?</string>
+    <string name="journal_emotion">How did it feel?</string>
+    <string name="journal_intensity">How strong?</string>
+    <string name="journal_unresolved">This is still unresolved</string>
+    <string name="journal_tags">Tags</string>
+    <string name="journal_saved">Moment saved</string>
+    <string name="check_in_title">Daily check-in</string>
+    <string name="check_in_mood">My mood</string>
+    <string name="check_in_energy">My energy</string>
+    <string name="check_in_connection">How connected we feel</string>
+    <string name="check_in_note">Anything on your mind?</string>
+    <string name="check_in_gratitude">One thing you appreciated about her</string>
+    <string name="check_in_saved">Checked in. See you tomorrow.</string>
+    <string name="repair_title">Repair starters</string>
+    <string name="repair_body">One sentence you can send right now.</string>
+
+    <!-- Insights -->
+    <string name="insights_title">Insights</string>
+    <string name="insights_total">Moments logged</string>
+    <string name="insights_unresolved">Unresolved</string>
+    <string name="insights_conflicts">Conflicts, 30 days</string>
+    <string name="insights_repairs">Repair attempts</string>
+    <string name="insights_ratio">Positive to negative</string>
+    <string name="insights_ratio_good">Above the 5:1 ratio linked to lasting relationships.</string>
+    <string name="insights_ratio_low">Below 5:1. More warmth, not less honesty.</string>
+    <string name="insights_conflict_down">Down %1$d from the month before.</string>
+    <string name="insights_conflict_up">Up %1$d from the month before.</string>
+    <string name="insights_conflict_flat">The same as the month before.</string>
+    <string name="insights_triggers">Recurring triggers</string>
+    <string name="insights_horsemen">Four Horsemen</string>
+    <string name="insights_horsemen_none">None detected. That is genuinely good news.</string>
+    <string name="insights_cadence">Conflict rhythm</string>
+    <string name="insights_cadence_body">Roughly one every %1$s days. Most often on a %2$s.</string>
+    <string name="insights_ai_patterns">What the coach notices</string>
+    <string name="insights_refresh">Refresh insights</string>
+    <string name="insights_empty_title">Not enough to see a pattern</string>
+    <string name="insights_empty_body">Log moments for about two weeks. Patterns need real data before they tell the truth.</string>
+    <string name="insights_connection_trend">Connection, last 14 check-ins</string>
+
+    <!-- Profiles -->
+    <string name="profile_me">My profile</string>
+    <string name="profile_partner">Her profile</string>
+    <string name="profile_completeness">Profile completeness</string>
+    <string name="profile_version">Version %1$d</string>
+    <string name="profile_history">Version history</string>
+    <string name="profile_restore">Restore this version</string>
+    <string name="profile_restored">Version restored</string>
+    <string name="profile_saved">Profile saved as a new version</string>
+    <string name="profile_empty_title">No profile yet</string>
+    <string name="profile_empty_body">Answer a few questions and the coach gets much sharper.</string>
+    <string name="profile_attachment">Attachment style</string>
+    <string name="profile_conflict">Conflict style</string>
+    <string name="profile_love">Love languages</string>
+    <string name="profile_triggers">Triggers</string>
+    <string name="profile_soothers">Soothers</string>
+    <string name="profile_bigfive">Big Five</string>
+    <string name="profile_stress">Under stress</string>
+    <string name="profile_comm">Communication preferences</string>
+    <string name="profile_note">Notes</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_privacy">Privacy and security</string>
+    <string name="settings_biometric">Lock the app</string>
+    <string name="settings_biometric_body">Require your fingerprint, face or PIN to open Us.</string>
+    <string name="settings_notification">Notification tone check</string>
+    <string name="settings_notification_body">Optional. Reads Instagram and Messenger notification text on device to warn you before things escalate. Nothing is uploaded, and you can turn it off any time.</string>
+    <string name="settings_notification_grant">Grant notification access</string>
+    <string name="settings_notification_granted">Access granted</string>
+    <string name="settings_section_ai">AI provider</string>
+    <string name="settings_cloud_toggle">Use cloud AI</string>
+    <string name="settings_cloud_body">Off by default. When on, only the text you explicitly analyse is sent to the endpoint you configure below.</string>
+    <string name="settings_base_url">Base URL</string>
+    <string name="settings_base_url_hint">https://your-proxy.example.com/v1</string>
+    <string name="settings_api_key">API key</string>
+    <string name="settings_api_key_hint">Stored encrypted on this device only</string>
+    <string name="settings_model">Model name</string>
+    <string name="settings_model_hint">gpt-4o-mini, llama-3.1-70b, your-model</string>
+    <string name="settings_embedding_model">Embedding model, optional</string>
+    <string name="settings_test_connection">Test connection</string>
+    <string name="settings_connection_ok">Connected. The model answered.</string>
+    <string name="settings_connection_failed">Could not connect: %1$s</string>
+    <string name="settings_credentials_saved">Saved securely</string>
+    <string name="settings_offline_model">On-device model</string>
+    <string name="settings_offline_model_rules">Rule engine only. Drop a .cact bundle into assets to upgrade.</string>
+    <string name="settings_offline_model_ready">Model bundle loaded, %1$s</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_dynamic_color">Dynamic colour</string>
+    <string name="settings_dynamic_color_body">Match the app to your wallpaper.</string>
+    <string name="settings_theme">Theme</string>
+    <string name="settings_section_data">Your data</string>
+    <string name="settings_wipe">Delete everything</string>
+    <string name="settings_wipe_body">Erases every profile, moment and check-in on this device. This cannot be undone.</string>
+    <string name="settings_wipe_confirm_title">Delete everything?</string>
+    <string name="settings_wipe_confirm_body">All profiles, moments and check-ins will be permanently erased from this phone.</string>
+    <string name="settings_wiped">All data deleted</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_version">Version %1$s (%2$d)</string>
+    <string name="settings_ethics">Us is a personal growth tool. It is not therapy, and it is not a way to monitor another person.</string>
+
+    <!-- Notification listener -->
+    <string name="notification_channel_coach">Tone warnings</string>
+    <string name="notification_channel_coach_body">Gentle nudges when a message might escalate.</string>
+    <string name="notification_tone_warning_title">That one might sting</string>
+    <string name="notification_tone_warning_body">Tap to see a kinder way to say it.</string>
+    <string name="notification_service_label">Us tone check</string>
+
+    <!-- Lock -->
+    <string name="lock_title">Us is locked</string>
+    <string name="lock_body">Unlock to see your profiles and moments.</string>
+    <string name="lock_prompt_title">Unlock Us</string>
+    <string name="lock_prompt_subtitle">Your relationship notes are private.</string>
+    <string name="lock_unlock">Unlock</string>
+
+    <!-- Errors -->
+    <string name="error_generic_title">Something went wrong</string>
+    <string name="error_no_network">No connection. The on-device coach still works.</string>
+    <string name="error_cloud_disabled">Cloud AI is switched off in settings.</string>
+    <string name="error_missing_credentials">Add a base URL, API key and model name in settings first.</string>
+    <string name="error_http">The model returned an error (%1$d).</string>
+    <string name="error_parse">The model replied in a format Us could not read.</string>
+    <string name="error_storage">Could not reach your encrypted storage.</string>
+
+    <!-- Accessibility -->
+    <string name="cd_emotion">Emotion: %1$s</string>
+    <string name="cd_unresolved">Unresolved moment</string>
+    <string name="cd_risk_level">Risk level: %1$s</string>
+    <string name="cd_provider_badge">Answered by %1$s</string>
+</resources>
