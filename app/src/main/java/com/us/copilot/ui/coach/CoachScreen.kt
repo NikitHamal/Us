@@ -64,7 +64,6 @@ fun CoachScreen(
     viewModel: CoachViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val cloudEnabled by viewModel.cloudEnabled.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val listState = rememberLazyListState()
     val savedLabel = stringResource(R.string.share_saved)
@@ -157,7 +156,6 @@ fun CoachScreen(
             ) {
                 ModelBar(
                     modelLabel = state.modelLabel,
-                    cloudEnabled = cloudEnabled,
                     onOpenSheet = { viewModel.setModelSheetVisible(true) },
                 )
                 AttachmentChips(
@@ -170,7 +168,7 @@ fun CoachScreen(
                     onSend = viewModel::ask,
                     onCheckDraft = viewModel::analyze,
                     enabled = !state.isBusy,
-                    canAttach = state.canAttach && cloudEnabled,
+                    canAttach = state.canAttach,
                     onAttach = { filePicker.launch("*/*") },
                 )
             }
@@ -180,8 +178,6 @@ fun CoachScreen(
     if (state.showModelSheet) {
         ModelSheet(
             config = state.nebians,
-            cloudEnabled = cloudEnabled,
-            onSetCloudAi = viewModel::setCloudAi,
             onDismiss = { viewModel.setModelSheetVisible(false) },
             onSelectProvider = viewModel::selectProvider,
             onSelectModel = viewModel::selectModel,

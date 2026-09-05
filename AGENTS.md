@@ -15,7 +15,7 @@ It is a **personal growth tool**, not a surveillance or manipulation tool.
 - It **never scrapes** Instagram/Messenger DMs.
 - Content enters the app only through **explicit user action** (Share‑to‑App, journal, manual
   entry) or an **opt‑in, on‑device Notification Listener** the user can disable at any time.
-- All analysis defaults to **on device**. Cloud AI is opt‑in and off by default.
+- All analysis runs on the selected Nebians model (free, no key) with the legacy custom endpoint as fallback. Failures surface as errors; there is no silent offline mode.
 
 ### Ethical guardrails (enforced in product copy + code)
 - No "how do I win the argument" framing. The rephrase engine is built on **Nonviolent
@@ -37,9 +37,9 @@ It is a **personal growth tool**, not a surveillance or manipulation tool.
 | ADR‑4 | **DataStore (Proto‑less, Preferences)** for non‑secret settings; **EncryptedSharedPreferences** for API keys | Never store secrets in DataStore plaintext. |
 | ADR‑5 | **`LlmProvider` interface** with `analyzeTone / rephrase / extractPatterns / embed`, selected at runtime by `LlmRouter` | Swappable providers; own proxy/scraper can be plugged in later with zero UI change. |
 | ADR‑10 | **Nebians fleet as device-native providers** (`ai/nebians/`): TryingOpen + keyless guest scrapers (K2Think, Poolside, Motif, Yqcloud, ChatJimmy) + keyless OpenAI pools (LLM7, Kilo, Zen) + official BYOK (Agnes, OpenAI, Anthropic, Gemini, DeepSeek, Custom). Server-only reversals (chat.qwen.ai WAF, QwenCloud umid, LongCat H5guard, GeminiWeb cookies) are excluded — they need Python/TLS-impersonation backends, and TryingOpen already serves the same Qwen family on-device. | No backend of our own; every listed provider answers a plain HTTPS POST from the phone. |
-| ADR‑11 | **Autonomous XML tool agent** (`NebiansAgentRunner` + `AgentProtocol`, ported from Nebians `runner.py`/`protocol.py`): tools advertised as Hermes `<tool_call>` schemas, results fed back as `<tool_response>`, loop capped at 6 with repeat detection. Routing is offline → Nebians → legacy cloud; agents prefer native cloud → Nebians XML → offline heuristic. | Scraped models have no native `tools` parameter; the protocol is in prose and execution stays local/auditable. |
+| ADR‑11 | **Autonomous XML tool agent** (`NebiansAgentRunner` + `AgentProtocol`, ported from Nebians `runner.py`/`protocol.py`): tools advertised as Hermes `<tool_call>` schemas, results fed back as `<tool_response>`, loop capped at 6 with repeat detection. Routing is Nebians → legacy cloud → real error; agents prefer native cloud → Nebians XML → real error. | Scraped models have no native `tools` parameter; the protocol is in prose and execution stays local/auditable. |
 | ADR‑12 | **Zero-shadow UI**: `UsCard` elevation 0, composer is a bordered single-line field (0 elevation), FABs flattened. | Explicit user preference. |
-| ADR‑6 | **Offline‑first with confidence escalation**: offline provider returns `confidence`; if `< 0.7` **and** cloud is enabled → escalate | Privacy default, quality when the user allows it. |
+| ADR‑6 | **Nebians-first, no silent fallback**: the selected model answers; failures return real errors | Explicit choice beats heuristics; hidden offline answers made the selector feel dead. |
 | ADR‑7 | **StateFlow + immutable UiState data classes**, one per screen | Predictable recomposition, easy tests. |
 | ADR‑8 | **CI‑only builds** via GitHub Actions with a committed default keystore | The owner never builds locally. See §7. |
 | ADR‑9 | **Max 500–600 lines per file**, hard rule. Split by responsibility. | Reviewability. Current largest file is tracked in §9. |
@@ -68,7 +68,7 @@ com.us.copilot
 │   └── usecase/                  one class per use case
 ├── ai/
 │   ├── LlmProvider.kt            THE abstraction
-│   ├── LlmRouter.kt              offline → cloud escalation policy
+│   ├── LlmRouter.kt              Nebians → cloud, real errors, no offline fallback
 │   ├── model/                    ToneAnalysis, RephraseSet, PatternReport, Embedding
 │   ├── nebians/                  Nebians fleet: catalog, Ktor clients, dispatcher, provider, XML agent
 │   ├── offline/                  OfflineProvider, CactModelLoader (.cact), rules engines
@@ -129,8 +129,7 @@ interface LlmProvider {
   the loader exposes the tool‑calling surface (`ToolRegistry`) the model can invoke.
 - **CloudProvider** — generic **OpenAI‑compatible** Ktor client. `baseUrl`, `apiKey`, `modelName`
   all come from secure settings at call time. **No key is ever in code, Git, or logs.**
-- **LlmRouter** — runs offline first; if `confidence < 0.7` and `cloudEnabled`, re‑runs on cloud and
-  returns the better result, tagging which provider answered so the UI can show it.
+- **LlmRouter** — Nebians first, legacy custom cloud second, real errors last. No offline answers.
 
 ---
 
@@ -203,6 +202,7 @@ workflow; tests and the file-size guard run inside this same job before the APK 
 **File size guard:** no source file exceeds 600 lines (checked in CI by `scripts/check_file_size.sh`).
 
 ### Changelog
+- **2026-09-05** — Offline mode removed, Nebians by default. `OfflineAgentRunner` deleted; `LlmRouter` (Nebians → legacy cloud → real error) and `AgentCoordinator` (native cloud → Nebians XML → real error) no longer degrade into on-device answers, and free Nebians providers need no toggle. `messageFor(Unknown)` now shows the actual reason so failing endpoints are diagnosable from the error bubble. `CONFIDENCE_THRESHOLD` removed with the escalation policy.
 - **2026-09-05** — Routing fix: explicit selection wins. `LlmRouter` used to run offline first and only escalate below 0.7 confidence, so the offline engine (often 0.62–0.74 confident) answered and the chosen Nebians model never fired. Now a usable Nebians selection answers first with offline as fallback; cloud-off means fully offline. The coach model sheet gained its own cloud-AI switch (was Settings-only), and Nebians failures log to logcat (`NebiansProvider`/`NebiansAgent`) instead of vanishing into silent fallback.
 - **2026-09-05** — Nebians fleet integration + zero-shadow UI. New `ai/nebians/` package: `NebiansCatalog` (15 providers / ~50 models with vision/thinking/file/reasoning capability flags), device-native Ktor clients (`NebiansOfficialClient` for OpenAI/Anthropic/Gemini wire formats incl. keyless pools, `TryingOpenClient` with quick/balanced/deep effort + 3×5 MB file upload, `GuestScraperClients` for K2Think/Poolside/Motif/Yqcloud/ChatJimmy), `NebiansDispatcher`, `NebiansProvider` (tone/rephrase/patterns single-shot), `AgentProtocol` (Hermes/Qwen-fn/fence/JSON parser) and `NebiansAgentRunner` (autonomous 6-turn XML tool loop with repeat guard). Settings stores provider/model/effort/temperature/maxTokens in DataStore and keys in SecureStore; coach has a model bottom sheet + attach button (file-capable models only); `LlmRouter` escalates offline → Nebians → legacy cloud and `AgentCoordinator` prefers native cloud → Nebians XML → offline. Composer is now single-line with a hairline border and 0 elevation; `UsCard` and FABs flattened. Tests: `AgentProtocolTest`, `NebiansCatalogTest`, `NebiansAgentRunnerTest`, extended `LlmRouterTest`.
 - **2026-09-05** — Initial end‑to‑end implementation of all modules A–D, CI/CD, privacy layer.

@@ -14,5 +14,5 @@ fun messageFor(error: AppError): String = when (error) {
     is AppError.Http -> stringResource(R.string.error_http, error.code)
     is AppError.Parse -> stringResource(R.string.error_parse)
     is AppError.Storage -> stringResource(R.string.error_storage)
-    is AppError.Unknown -> stringResource(R.string.error_generic_title)
+    is AppError.Unknown -> stringResource(R.string.error_unknown_detail, error.debugMessage)
 }

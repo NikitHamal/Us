@@ -32,6 +32,3 @@ interface LlmProvider {
     /** Vector for semantic search over memories. */
     suspend fun embed(text: String): Outcome<FloatArray>
 }
-
-/** Confidence below this escalates to the cloud provider when the user enabled it. */
-const val CONFIDENCE_THRESHOLD: Float = 0.7f

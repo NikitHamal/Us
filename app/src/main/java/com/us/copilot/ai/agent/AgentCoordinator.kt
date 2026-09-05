@@ -1,6 +1,7 @@
 package com.us.copilot.ai.agent
 
 import com.us.copilot.ai.nebians.NebiansAgentRunner
+import com.us.copilot.core.util.AppError
 import com.us.copilot.core.util.Outcome
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -8,40 +9,32 @@ import javax.inject.Singleton
 /**
  * Chooses which runner handles a turn.
  *
- * Prefers the native tool-calling cloud agent when configured, then the
- * Nebians autonomous agent (Hermes XML tool protocol over free keyless
- * models), and finally the on-device heuristic. A failed network runner
- * degrades to the next one down, so a dropped connection ends in grounded
- * local retrieval instead of an error bubble.
+ * Nebians models are the default engine and the legacy custom endpoint is the
+ * fallback. Failures surface as real errors — there is no offline mode to
+ * degrade into, so a failing provider is visible instead of masquerading as
+ * an on-device answer.
  */
 @Singleton
 class AgentCoordinator @Inject constructor(
     private val cloud: CloudAgentRunner,
     private val nebians: NebiansAgentRunner,
-    private val offline: OfflineAgentRunner,
 ) {
 
     suspend fun run(request: AgentRequestSpec): Outcome<AgentTurn> {
+        var lastFailure: Outcome.Failure? = null
         if (cloud.isAvailable()) {
             when (val result = cloud.run(request)) {
                 is Outcome.Success -> return result
-                is Outcome.Failure -> Unit // fall through to Nebians
+                is Outcome.Failure -> lastFailure = result
             }
         }
         if (nebians.isAvailable()) {
-            when (val result = nebians.run(request)) {
-                is Outcome.Success -> return result
-                is Outcome.Failure -> {
-                    // A hard config error (unknown provider) should surface rather than
-                    // masquerade as an offline answer; transient failures fall through.
-                    if (result.error is com.us.copilot.core.util.AppError.MissingCredentials) return result
-                }
-            }
+            return nebians.run(request)
         }
-        return offline.run(request)
+        return lastFailure ?: Outcome.Failure(AppError.MissingCredentials)
     }
 
-    /** True when a real tool-calling agent is driving, rather than the heuristic fallback. */
+    /** True when a real tool-calling agent is driving. */
     suspend fun isFullAgentAvailable(): Boolean = cloud.isAvailable() || nebians.isAvailable()
 
     companion object {

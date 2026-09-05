@@ -74,10 +74,11 @@ object AiModule {
     @Provides
     @Singleton
     fun provideNebiansGate(
-        source: CloudEnabledSource,
         @Nebians nebians: LlmProvider,
     ): NebiansGate = object : NebiansGate {
-        override suspend fun isNebiansUsable(): Boolean = source.enabled.first() && nebians.isAvailable()
+        // Free Nebians providers are on by default — no toggle, no key. Key-required
+        // providers report usability through credentials instead.
+        override suspend fun isNebiansUsable(): Boolean = nebians.isAvailable()
     }
 
     @Provides
@@ -87,6 +88,5 @@ object AiModule {
         @Nebians nebians: LlmProvider,
         @Cloud cloud: LlmProvider,
         gate: CloudGate,
-        nebiansGate: NebiansGate,
-    ): LlmRouter = LlmRouter(offline, nebians, cloud, gate, nebiansGate)
+    ): LlmRouter = LlmRouter(offline, nebians, cloud, gate)
 }

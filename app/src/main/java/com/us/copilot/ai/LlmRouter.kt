@@ -11,37 +11,32 @@ import com.us.copilot.core.util.Outcome
 /**
  * Routing policy.
  *
- * An explicitly selected Nebians model wins: when cloud AI is enabled and the
- * selection is usable (free providers need no key), it answers first and the
- * on-device engine is only a fallback. Picking a model is consent to use it —
- * silently answering on-device anyway is what made the selector feel dead.
- * With cloud AI off, everything stays on-device and nothing leaves the phone.
+ * Nebians is the default engine: the user's selected model answers first, the
+ * legacy custom endpoint is the fallback, and failures surface as real errors
+ * instead of degrading into on-device answers. There is no silent offline
+ * mode — when nothing can answer, the caller gets the actual failure.
  */
 class LlmRouter(
     private val offline: LlmProvider,
     private val nebians: LlmProvider,
     private val cloud: LlmProvider,
     private val cloudGate: CloudGate,
-    private val nebiansGate: NebiansGate,
 ) {
 
     suspend fun analyzeTone(request: ToneRequest): Outcome<ToneAnalysis> =
         route(
-            offlineCall = { offline.analyzeTone(request) },
             nebiansCall = { nebians.analyzeTone(request) },
             cloudCall = { cloud.analyzeTone(request) },
         )
 
     suspend fun rephrase(request: RephraseRequest): Outcome<RephraseSet> =
         route(
-            offlineCall = { offline.rephrase(request) },
             nebiansCall = { nebians.rephrase(request) },
             cloudCall = { cloud.rephrase(request) },
         )
 
     suspend fun extractPatterns(request: PatternRequest): Outcome<PatternReport> =
         route(
-            offlineCall = { offline.extractPatterns(request) },
             nebiansCall = { nebians.extractPatterns(request) },
             cloudCall = { cloud.extractPatterns(request) },
         )
@@ -49,26 +44,16 @@ class LlmRouter(
     suspend fun embed(text: String): Outcome<FloatArray> = offline.embed(text)
 
     private suspend fun <T> route(
-        offlineCall: suspend () -> Outcome<T>,
         nebiansCall: suspend () -> Outcome<T>,
         cloudCall: suspend () -> Outcome<T>,
     ): Outcome<T> {
-        if (nebiansGate.isNebiansUsable()) {
-            val nebiansResult = nebiansCall()
-            if (nebiansResult is Outcome.Success) return nebiansResult
-            if (cloudGate.isCloudUsable()) {
-                val cloudResult = cloudCall()
-                if (cloudResult is Outcome.Success) return cloudResult
-            }
-            val offlineResult = offlineCall()
-            return if (offlineResult is Outcome.Success) offlineResult else nebiansResult
-        }
-
+        val nebiansResult = nebiansCall()
+        if (nebiansResult is Outcome.Success) return nebiansResult
         if (cloudGate.isCloudUsable()) {
             val cloudResult = cloudCall()
             if (cloudResult is Outcome.Success) return cloudResult
         }
-        return offlineCall()
+        return nebiansResult
     }
 }
 
@@ -77,7 +62,7 @@ interface CloudGate {
     suspend fun isCloudUsable(): Boolean
 }
 
-/** Gate for the Nebians fleet: same explicit cloud toggle, provider availability checked separately. */
+/** Gate for the Nebians fleet: free providers are always usable, key-required ones need credentials. */
 interface NebiansGate {
     suspend fun isNebiansUsable(): Boolean
 }

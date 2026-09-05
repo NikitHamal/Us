@@ -129,7 +129,12 @@ class NebiansProvider @Inject constructor(
         parse: (String) -> T,
     ): Outcome<T> {
         val config = settings.nebiansConfigSnapshot()
-        if (NebiansCatalog.find(config.providerSlug) == null) {
+        val provider = NebiansCatalog.find(config.providerSlug)
+            ?: return Outcome.Failure(AppError.MissingCredentials)
+        if (provider.slug == "custom" && config.baseUrlOverride.isBlank()) {
+            return Outcome.Failure(AppError.MissingCredentials)
+        }
+        if (provider.keyRequired && config.apiKey.isBlank()) {
             return Outcome.Failure(AppError.MissingCredentials)
         }
         return try {

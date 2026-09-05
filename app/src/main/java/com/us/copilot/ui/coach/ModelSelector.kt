@@ -50,7 +50,6 @@ import com.us.copilot.ui.theme.UsShapes
 @Composable
 fun ModelBar(
     modelLabel: String,
-    cloudEnabled: Boolean,
     onOpenSheet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -65,7 +64,7 @@ fun ModelBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                if (cloudEnabled) modelLabel else stringResource(R.string.coach_model_offline),
+                modelLabel,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
@@ -87,8 +86,6 @@ fun ModelBar(
 @Composable
 fun ModelSheet(
     config: NebiansConfig,
-    cloudEnabled: Boolean,
-    onSetCloudAi: (Boolean) -> Unit,
     onDismiss: () -> Unit,
     onSelectProvider: (String) -> Unit,
     onSelectModel: (String) -> Unit,
@@ -113,28 +110,7 @@ fun ModelSheet(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Row(
-                Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        stringResource(R.string.coach_model_cloud_toggle),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                    Text(
-                        stringResource(R.string.coach_model_cloud_body),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                androidx.compose.material3.Switch(
-                    checked = cloudEnabled,
-                    onCheckedChange = onSetCloudAi,
-                    modifier = Modifier.padding(start = 12.dp),
-                )
-            }
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(8.dp))
 
             Text(stringResource(R.string.coach_model_provider), style = MaterialTheme.typography.titleSmall)
             NebiansProviderList(

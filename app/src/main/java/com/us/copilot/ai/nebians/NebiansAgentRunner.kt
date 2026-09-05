@@ -49,7 +49,7 @@ class NebiansAgentRunner @Inject constructor(
     }
 
     override suspend fun run(request: AgentRequestSpec): Outcome<AgentTurn> {
-        if (!gate.isNebiansUsable()) return Outcome.Failure(AppError.CloudDisabled)
+        if (!gate.isNebiansUsable()) return Outcome.Failure(AppError.MissingCredentials)
         val config = try {
             settings.nebiansConfigSnapshot()
         } catch (e: Exception) {

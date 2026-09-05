@@ -126,12 +126,9 @@
     <string name="coach_provider_nebians">Analysed by Nebians</string>
     <string name="coach_provider_cloud">Analysed by your cloud model</string>
     <string name="coach_attach">Attach a file</string>
-    <string name="coach_model_offline">Offline only — turn on cloud AI for models</string>
     <string name="coach_model_change">Change model</string>
     <string name="coach_model_title">Choose a model</string>
-    <string name="coach_model_body">Free Nebians models need no key. Scraped models answer through an on-device tool protocol, so the coach can still read your timeline before replying.</string>
-    <string name="coach_model_cloud_toggle">Use cloud AI</string>
-    <string name="coach_model_cloud_body">The selected model only answers when this is on. Off means everything stays on this phone.</string>
+    <string name="coach_model_body">Free Nebians models work out of the box, no key needed. Scraped models answer through an on-device tool protocol, so the coach can still read your timeline before replying.</string>
     <string name="coach_model_provider">Provider</string>
     <string name="coach_model_model">Model</string>
     <string name="coach_model_effort">Reasoning effort</string>
@@ -225,10 +222,10 @@
     <string name="settings_notification_granted">Access granted</string>
     <string name="settings_section_ai">AI provider</string>
     <string name="settings_section_nebians">Nebians models</string>
-    <string name="settings_nebians_body">Free models answer with no key. Pick a provider and a live model; the coach uses it for open questions, and for tone checks the on-device engine is unsure about.</string>
+    <string name="settings_nebians_body">Free models answer out of the box with no key and no toggle. Pick a provider and a live model; the coach uses it for open questions and tone checks.</string>
     <string name="settings_nebians_files">This provider accepts file attachments in the coach.</string>
-    <string name="settings_cloud_toggle">Use cloud AI</string>
-    <string name="settings_cloud_body">Off by default. When on, only the text you explicitly analyse is sent to the endpoint you configure below.</string>
+    <string name="settings_cloud_toggle">Use custom cloud endpoint</string>
+    <string name="settings_cloud_body">Optional fallback for your own OpenAI-compatible endpoint below. Nebians models above work without this.</string>
     <string name="settings_base_url">Base URL</string>
     <string name="settings_base_url_hint">https://your-proxy.example.com/v1</string>
     <string name="settings_api_key">API key</string>
@@ -277,6 +274,7 @@
 
     <!-- Errors -->
     <string name="error_generic_title">Something went wrong</string>
+    <string name="error_unknown_detail">Something went wrong: %1$s</string>
     <string name="error_no_network">No connection. The on-device coach still works.</string>
     <string name="error_cloud_disabled">Cloud AI is switched off in settings.</string>
     <string name="error_missing_credentials">Add a base URL, API key and model name in settings first.</string>

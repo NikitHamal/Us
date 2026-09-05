@@ -27,10 +27,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -88,10 +86,6 @@ class CoachViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(CoachUiState())
     val uiState: StateFlow<CoachUiState> = _uiState.asStateFlow()
-
-    /** Cloud toggle, so the model bar can explain why network models are off. */
-    val cloudEnabled: StateFlow<Boolean> = settings.cloudEnabled
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
     init {
         viewModelScope.launch {
@@ -313,10 +307,6 @@ class CoachViewModel @Inject constructor(
     // --- Model selection (Nebians fleet) ------------------------------------
 
     fun setModelSheetVisible(visible: Boolean) = _uiState.update { it.copy(showModelSheet = visible) }
-
-    fun setCloudAi(enabled: Boolean) {
-        viewModelScope.launch { settings.setCloudAi(enabled) }
-    }
 
     fun selectProvider(slug: String) {
         viewModelScope.launch { settings.setNebiansProvider(slug) }
