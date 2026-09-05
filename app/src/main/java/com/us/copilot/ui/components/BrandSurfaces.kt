@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -16,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import com.us.copilot.ui.theme.UsGradients
 import com.us.copilot.ui.theme.UsShapes
@@ -30,7 +30,7 @@ import com.us.copilot.ui.theme.UsShapes
 @Composable
 fun BrandHero(
     modifier: Modifier = Modifier,
-    shape: RoundedCornerShape = UsShapes.extraLarge,
+    shape: Shape = UsShapes.extraLarge,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val stops = if (isSystemInDarkTheme()) UsGradients.warmDark else UsGradients.warmLight
