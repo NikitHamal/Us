@@ -2,6 +2,7 @@ package com.us.copilot.ui.onboarding
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,21 +62,42 @@ fun OnboardingScreen(
             Spacer(Modifier.height(UsDimens.gutter))
 
             if (!state.page.isIntro) {
+                val progress by animateFloatAsState(
+                    targetValue = state.stepNumber.toFloat() / state.totalSteps,
+                    animationSpec = tween(420),
+                    label = "onboardingProgress",
+                )
                 LinearProgressIndicator(
-                    progress = { state.stepNumber.toFloat() / state.totalSteps },
-                    modifier = Modifier.fillMaxWidth().height(6.dp),
-                    strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth().height(8.dp),
+                    strokeCap = StrokeCap.Round,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 )
-                Text(
-                    text = stringResource(
-                        R.string.onboarding_step,
-                        state.stepNumber.coerceAtMost(state.totalSteps),
-                        state.totalSteps,
-                    ),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+                Row(
+                    Modifier.fillMaxWidth().padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = stringResource(
+                            if (state.page.isForPartner) {
+                                R.string.onboarding_section_partner
+                            } else {
+                                R.string.onboarding_section_me
+                            },
+                        ),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.onboarding_step,
+                            state.stepNumber.coerceAtMost(state.totalSteps),
+                            state.totalSteps,
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             AnimatedContent(
@@ -109,6 +132,7 @@ fun OnboardingScreen(
                 Button(
                     onClick = viewModel::next,
                     enabled = state.canContinue && !state.isSaving,
+                    contentPadding = PaddingValues(horizontal = 28.dp, vertical = 14.dp),
                 ) {
                     Text(
                         stringResource(

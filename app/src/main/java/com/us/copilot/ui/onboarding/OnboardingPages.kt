@@ -3,6 +3,8 @@ package com.us.copilot.ui.onboarding
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,16 +12,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.us.copilot.R
 import com.us.copilot.core.model.AttachmentStyle
-import com.us.copilot.core.model.BigFive
 import com.us.copilot.core.model.ConflictStyle
 import com.us.copilot.core.model.LoveLanguage
-import com.us.copilot.core.model.Profile
 import com.us.copilot.core.model.ProfileVocabulary
 import com.us.copilot.ui.components.BigFiveSliders
 import com.us.copilot.ui.components.ChipMultiSelect
@@ -42,16 +44,19 @@ fun OnboardingPageContent(
     ) {
         when (state.page) {
             OnboardingPage.WELCOME -> Intro(
-                stringResource(R.string.onboarding_welcome_title),
-                stringResource(R.string.onboarding_welcome_body),
+                title = stringResource(R.string.onboarding_welcome_title),
+                body = stringResource(R.string.onboarding_welcome_body),
+                art = { TwoHeartsArt() },
             )
             OnboardingPage.PRIVACY -> Intro(
-                stringResource(R.string.onboarding_privacy_title),
-                stringResource(R.string.onboarding_privacy_body),
+                title = stringResource(R.string.onboarding_privacy_title),
+                body = stringResource(R.string.onboarding_privacy_body),
+                art = { PrivacyShieldArt() },
             )
             OnboardingPage.ETHICS -> Intro(
-                stringResource(R.string.onboarding_ethics_title),
-                stringResource(R.string.onboarding_ethics_body),
+                title = stringResource(R.string.onboarding_ethics_title),
+                body = stringResource(R.string.onboarding_ethics_body),
+                art = { BalanceArt() },
             )
 
             OnboardingPage.ME_NAME, OnboardingPage.PARTNER_NAME -> NamePage(
@@ -153,13 +158,20 @@ fun OnboardingPageContent(
 }
 
 @Composable
-private fun Intro(title: String, body: String) {
-    Column {
-        Text(title, style = MaterialTheme.typography.displaySmall)
+private fun Intro(title: String, body: String, art: @Composable () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        art()
+        Spacer(Modifier.height(UsDimens.sectionSpacing))
+        Text(
+            title,
+            style = MaterialTheme.typography.displaySmall,
+            textAlign = TextAlign.Center,
+        )
         Text(
             body,
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = UsDimens.gutter),
         )
     }

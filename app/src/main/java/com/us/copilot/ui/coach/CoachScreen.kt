@@ -136,8 +136,8 @@ fun CoachScreen(
             ChatComposer(
                 value = state.draft,
                 onValueChange = viewModel::onDraftChange,
-                onSend = viewModel::analyze,
-                onRephrase = viewModel::rephrase,
+                onSend = viewModel::ask,
+                onCheckDraft = viewModel::analyze,
                 enabled = !state.isBusy,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -182,6 +182,11 @@ private fun Transcript(
                 is ChatItem.RephraseCardItem -> CoachAttachment {
                     RephraseCard(rephrase = item.rephrase, onUseRewrite = onUseRewrite)
                 }
+                is ChatItem.AgentReply -> AgentReplyBubble(
+                    text = item.text,
+                    steps = item.steps,
+                    hitCap = item.hitIterationCap,
+                )
                 is ChatItem.ErrorBubble -> CoachAttachment {
                     ErrorBubbleCard(message = messageFor(item.error), onRetry = onRetry)
                 }

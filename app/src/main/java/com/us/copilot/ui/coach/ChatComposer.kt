@@ -19,7 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,7 +53,7 @@ fun ChatComposer(
     value: String,
     onValueChange: (String) -> Unit,
     onSend: () -> Unit,
-    onRephrase: () -> Unit,
+    onCheckDraft: () -> Unit,
     enabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -100,10 +100,10 @@ fun ChatComposer(
                 enter = fadeIn() + scaleIn(initialScale = 0.7f),
                 exit = fadeOut() + scaleOut(targetScale = 0.7f),
             ) {
-                IconButton(onClick = onRephrase, enabled = enabled) {
+                IconButton(onClick = onCheckDraft, enabled = enabled) {
                     Icon(
-                        Icons.Filled.AutoAwesome,
-                        contentDescription = stringResource(R.string.coach_rephrase),
+                        Icons.Filled.Shield,
+                        contentDescription = stringResource(R.string.coach_analyze),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
@@ -123,7 +123,7 @@ fun ChatComposer(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.Send,
-                        contentDescription = stringResource(R.string.coach_analyze),
+                        contentDescription = stringResource(R.string.coach_send),
                         modifier = Modifier.size(20.dp),
                     )
                 }

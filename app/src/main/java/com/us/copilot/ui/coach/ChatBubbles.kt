@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -28,6 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -35,6 +39,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.us.copilot.R
+import com.us.copilot.ai.agent.AgentStep
 
 /**
  * Asymmetric bubble corners — the corner nearest the speaker is tucked in (6dp) while the rest
@@ -186,6 +191,77 @@ fun ErrorBubbleCard(
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     style = MaterialTheme.typography.labelLarge,
                 )
+            }
+        }
+    }
+}
+
+/**
+ * Agent answer, with an expandable list of the tools it used.
+ *
+ * The trail is collapsed by default but always present. In a privacy-sensitive app it matters
+ * that the user can check what the model actually read before it answered, rather than taking
+ * a confident paragraph on faith.
+ */
+@Composable
+fun AgentReplyBubble(
+    text: String,
+    steps: List<AgentStep>,
+    hitCap: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
+        CoachAvatar()
+        Spacer(Modifier.width(10.dp))
+        Surface(
+            shape = coachShape,
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+            modifier = Modifier.widthIn(max = bubbleMaxWidth()),
+        ) {
+            Column(Modifier.padding(horizontal = 18.dp, vertical = 13.dp)) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+
+                if (hitCap) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = stringResource(R.string.coach_agent_capped),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+
+                if (steps.isNotEmpty()) {
+                    Spacer(Modifier.height(8.dp))
+                    TextButton(
+                        onClick = { expanded = !expanded },
+                        contentPadding = PaddingValues(0.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.coach_agent_steps, steps.size),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                    if (expanded) {
+                        steps.forEach { step ->
+                            Text(
+                                text = "· ${step.toolName}" +
+                                    if (step.isMutating) " (changed data)" else "",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (step.succeeded) {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                } else {
+                                    MaterialTheme.colorScheme.error
+                                },
+                            )
+                        }
+                    }
+                }
             }
         }
     }

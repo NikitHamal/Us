@@ -2,6 +2,7 @@ package com.us.copilot.ui.coach
 
 import androidx.annotation.StringRes
 import com.us.copilot.R
+import com.us.copilot.ai.agent.AgentStep
 import com.us.copilot.ai.model.RephraseSet
 import com.us.copilot.ai.model.ToneAnalysis
 import com.us.copilot.core.util.AppError
@@ -47,6 +48,14 @@ sealed interface ChatItem {
     /** Animated three-dot bubble while the model is thinking. */
     data class Thinking(
         override val id: Long,
+    ) : ChatItem
+
+    /** Free-form agent answer, with the tools it used shown beneath. */
+    data class AgentReply(
+        override val id: Long,
+        val text: String,
+        val steps: List<AgentStep> = emptyList(),
+        val hitIterationCap: Boolean = false,
     ) : ChatItem
 
     /** A recoverable failure rendered inline, with retry. */

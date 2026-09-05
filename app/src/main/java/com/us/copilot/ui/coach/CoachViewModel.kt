@@ -9,6 +9,8 @@ import com.us.copilot.core.model.Memory
 import com.us.copilot.core.model.MemorySource
 import com.us.copilot.core.model.Speaker
 import com.us.copilot.core.util.Outcome
+import com.us.copilot.ai.agent.AgentHistoryEntry
+import com.us.copilot.domain.usecase.AskCoachUseCase
 import com.us.copilot.domain.usecase.BeforeYouSendUseCase
 import com.us.copilot.domain.usecase.RephraseUseCase
 import com.us.copilot.domain.usecase.SaveMemoryUseCase
@@ -25,13 +27,14 @@ data class CoachUiState(
     val draft: String = "",
     val isAnalyzing: Boolean = false,
     val isRephrasing: Boolean = false,
+    val isAsking: Boolean = false,
     val savedMessage: Boolean = false,
     /** Last analysed text, kept so "save as moment" works after the input clears. */
     val lastAnalyzed: String = "",
     val lastTone: ToneAnalysis? = null,
 ) {
     val hasInput: Boolean get() = draft.trim().length >= 2
-    val isBusy: Boolean get() = isAnalyzing || isRephrasing
+    val isBusy: Boolean get() = isAnalyzing || isRephrasing || isAsking
     val isEmpty: Boolean get() = items.isEmpty()
     val canSaveMoment: Boolean get() = lastTone != null && lastAnalyzed.isNotBlank()
 }
@@ -39,6 +42,7 @@ data class CoachUiState(
 @HiltViewModel
 class CoachViewModel @Inject constructor(
     private val beforeYouSend: BeforeYouSendUseCase,
+    private val askCoach: AskCoachUseCase,
     private val rephraseUseCase: RephraseUseCase,
     private val saveMemory: SaveMemoryUseCase,
 ) : ViewModel() {
@@ -50,6 +54,48 @@ class CoachViewModel @Inject constructor(
     private fun id(): Long = nextId++
 
     fun onDraftChange(value: String) = _uiState.update { it.copy(draft = value) }
+
+    /**
+     * Open-ended question for the agent.
+     *
+     * Separate from [analyze]: that checks a draft the user intends to send, this asks the coach
+     * something. Both share the transcript so the conversation reads as one thread.
+     */
+    fun ask() {
+        val text = _uiState.value.draft.trim()
+        if (text.length < 2 || _uiState.value.isBusy) return
+
+        val thinkingId = id()
+        val history = _uiState.value.items.toHistory()
+
+        _uiState.update {
+            it.copy(
+                items = it.items +
+                    ChatItem.UserDraft(id(), text) +
+                    ChatItem.Thinking(thinkingId),
+                draft = "",
+                isAsking = true,
+            )
+        }
+
+        viewModelScope.launch {
+            val replacement = when (val result = askCoach(text, history)) {
+                is Outcome.Success -> ChatItem.AgentReply(
+                    id = id(),
+                    text = result.value.reply,
+                    steps = result.value.steps,
+                    hitIterationCap = result.value.hitIterationCap,
+                )
+                is Outcome.Failure -> ChatItem.ErrorBubble(id(), result.error)
+            }
+            _uiState.update {
+                it.copy(
+                    items = it.items.replaceThinking(thinkingId, listOf(replacement)),
+                    isAsking = false,
+                )
+            }
+        }
+    }
 
     /** Fills the composer from a starter chip without sending, so the user can edit first. */
     fun applyStarter(prompt: String) = _uiState.update { it.copy(draft = prompt) }
@@ -216,6 +262,20 @@ class CoachViewModel @Inject constructor(
         tone.harshnessScore >= 45 -> 4
         tone.harshnessScore >= 20 -> 3
         else -> 2
+    }
+}
+
+/**
+ * Flattens the transcript into agent history.
+ *
+ * Only plain user text and agent prose carry forward — tone/rephrase cards are structured UI, and
+ * replaying them as text would bloat the prompt without adding conversational meaning.
+ */
+private fun List<ChatItem>.toHistory(): List<AgentHistoryEntry> = mapNotNull { item ->
+    when (item) {
+        is ChatItem.UserDraft -> AgentHistoryEntry(isUser = true, text = item.text)
+        is ChatItem.AgentReply -> AgentHistoryEntry(isUser = false, text = item.text)
+        else -> null
     }
 }
 

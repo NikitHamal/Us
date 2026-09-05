@@ -53,6 +53,8 @@
     <string name="onboarding_comm_title">Communication preferences</string>
     <string name="onboarding_comm_body">The unwritten rules that keep things easy.</string>
     <string name="onboarding_finish">Finish setup</string>
+    <string name="onboarding_section_me">About you</string>
+    <string name="onboarding_section_partner">About your partner</string>
     <string name="onboarding_step">Step %1$d of %2$d</string>
 
     <!-- Home -->
@@ -113,6 +115,9 @@
     <string name="coach_ack_safe">That reads as kind. Here is what I see.</string>
     <string name="coach_ack_risky">Worth a second look before you send this.</string>
     <string name="coach_ack_rewrite">Here are three other ways to say it.</string>
+    <string name="coach_send">Ask the coach</string>
+    <string name="coach_agent_steps">Looked at %1$d thing(s)</string>
+    <string name="coach_agent_capped">I ran out of steps before finishing that one.</string>
     <string name="coach_greeting">What do you want to say?</string>
     <string name="coach_empty_title">Nothing to check yet</string>
     <string name="coach_empty_body">Type your draft above, or share a message into Us from Instagram or Messenger.</string>
