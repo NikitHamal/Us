@@ -139,10 +139,13 @@ class NebiansProvider @Inject constructor(
         } catch (cancellation: kotlinx.coroutines.CancellationException) {
             throw cancellation
         } catch (e: NebiansException) {
+            android.util.Log.w(TAG, "Nebians ${settingsLabel(config)} request failed: ${e.message}")
             Outcome.Failure(AppError.Unknown(e.message ?: "Nebians request failed"))
         } catch (io: java.io.IOException) {
+            android.util.Log.w(TAG, "Nebians network unreachable: ${io.message}")
             Outcome.Failure(AppError.NoNetwork)
         } catch (t: Throwable) {
+            android.util.Log.w(TAG, "Nebians unexpected failure", t)
             Outcome.Failure(AppError.Unknown(t.message ?: "Nebians request failed"))
         }
     }
@@ -157,4 +160,13 @@ class NebiansProvider @Inject constructor(
 
     private inline fun <reified E : Enum<E>> enumOr(name: String, fallback: E): E =
         enumValues<E>().firstOrNull { it.name.equals(name, true) } ?: fallback
+
+    private fun settingsLabel(config: com.us.copilot.domain.repository.NebiansConfig): String {
+        val model = config.modelId.ifBlank { NebiansCatalog.effectiveModel(config.providerSlug, "") }
+        return "${config.providerSlug}/$model"
+    }
+
+    private companion object {
+        const val TAG = "NebiansProvider"
+    }
 }

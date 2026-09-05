@@ -180,6 +180,8 @@ fun CoachScreen(
     if (state.showModelSheet) {
         ModelSheet(
             config = state.nebians,
+            cloudEnabled = cloudEnabled,
+            onSetCloudAi = viewModel::setCloudAi,
             onDismiss = { viewModel.setModelSheetVisible(false) },
             onSelectProvider = viewModel::selectProvider,
             onSelectModel = viewModel::selectModel,

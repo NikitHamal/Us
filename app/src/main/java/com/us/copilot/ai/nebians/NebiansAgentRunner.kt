@@ -94,8 +94,10 @@ class NebiansAgentRunner @Inject constructor(
                     maxTokensOverride = 1_200,
                 ).text
             } catch (e: NebiansException) {
+                android.util.Log.w(TAG, "Nebians agent turn failed: ${e.message}")
                 return Outcome.Failure(AppError.Unknown(e.message ?: "Nebians request failed"))
             } catch (io: java.io.IOException) {
+                android.util.Log.w(TAG, "Nebians agent network unreachable: ${io.message}")
                 return Outcome.Failure(AppError.NoNetwork)
             } catch (cancellation: kotlinx.coroutines.CancellationException) {
                 throw cancellation
@@ -188,6 +190,7 @@ class NebiansAgentRunner @Inject constructor(
     }
 
     companion object {
+        private const val TAG = "NebiansAgent"
         private const val FN_CALL_TEMPLATE = """# Tools
 
 You may call one or more functions to assist with the user query.

@@ -9,13 +9,13 @@ import com.us.copilot.ai.model.ToneRequest
 import com.us.copilot.core.util.Outcome
 
 /**
- * Offline-first routing policy.
+ * Routing policy.
  *
- * 1. Always run the on-device provider first — it costs nothing and leaks nothing.
- * 2. If its confidence is below [CONFIDENCE_THRESHOLD], try the user's selected Nebians model
- *    when cloud AI is enabled and the selection is usable (free providers need no key).
- * 3. If Nebians is unavailable or fails, try the legacy custom cloud endpoint when enabled.
- * 4. If every network call fails, silently keep the offline answer.
+ * An explicitly selected Nebians model wins: when cloud AI is enabled and the
+ * selection is usable (free providers need no key), it answers first and the
+ * on-device engine is only a fallback. Picking a model is consent to use it —
+ * silently answering on-device anyway is what made the selector feel dead.
+ * With cloud AI off, everything stays on-device and nothing leaves the phone.
  */
 class LlmRouter(
     private val offline: LlmProvider,
@@ -30,7 +30,6 @@ class LlmRouter(
             offlineCall = { offline.analyzeTone(request) },
             nebiansCall = { nebians.analyzeTone(request) },
             cloudCall = { cloud.analyzeTone(request) },
-            confidenceOf = { it.confidence },
         )
 
     suspend fun rephrase(request: RephraseRequest): Outcome<RephraseSet> =
@@ -38,7 +37,6 @@ class LlmRouter(
             offlineCall = { offline.rephrase(request) },
             nebiansCall = { nebians.rephrase(request) },
             cloudCall = { cloud.rephrase(request) },
-            confidenceOf = { it.confidence },
         )
 
     suspend fun extractPatterns(request: PatternRequest): Outcome<PatternReport> =
@@ -46,7 +44,6 @@ class LlmRouter(
             offlineCall = { offline.extractPatterns(request) },
             nebiansCall = { nebians.extractPatterns(request) },
             cloudCall = { cloud.extractPatterns(request) },
-            confidenceOf = { it.confidence },
         )
 
     suspend fun embed(text: String): Outcome<FloatArray> = offline.embed(text)
@@ -55,37 +52,23 @@ class LlmRouter(
         offlineCall: suspend () -> Outcome<T>,
         nebiansCall: suspend () -> Outcome<T>,
         cloudCall: suspend () -> Outcome<T>,
-        confidenceOf: (T) -> Float,
     ): Outcome<T> {
-        val offlineResult = offlineCall()
-        val offlineValue = offlineResult.valueOrNull
-
-        val needsEscalation = offlineValue == null || confidenceOf(offlineValue) < CONFIDENCE_THRESHOLD
-        if (!needsEscalation) return offlineResult
-
         if (nebiansGate.isNebiansUsable()) {
             val nebiansResult = nebiansCall()
             if (nebiansResult is Outcome.Success) return nebiansResult
-            // Fall through to legacy cloud before giving up on the network path.
             if (cloudGate.isCloudUsable()) {
                 val cloudResult = cloudCall()
-                return when {
-                    cloudResult is Outcome.Success -> cloudResult
-                    offlineResult is Outcome.Success -> offlineResult
-                    else -> nebiansResult
-                }
+                if (cloudResult is Outcome.Success) return cloudResult
             }
+            val offlineResult = offlineCall()
             return if (offlineResult is Outcome.Success) offlineResult else nebiansResult
         }
 
-        if (!cloudGate.isCloudUsable()) return offlineResult
-
-        val cloudResult = cloudCall()
-        return when {
-            cloudResult is Outcome.Success -> cloudResult
-            offlineResult is Outcome.Success -> offlineResult
-            else -> cloudResult
+        if (cloudGate.isCloudUsable()) {
+            val cloudResult = cloudCall()
+            if (cloudResult is Outcome.Success) return cloudResult
         }
+        return offlineCall()
     }
 }
 

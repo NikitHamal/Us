@@ -87,6 +87,8 @@ fun ModelBar(
 @Composable
 fun ModelSheet(
     config: NebiansConfig,
+    cloudEnabled: Boolean,
+    onSetCloudAi: (Boolean) -> Unit,
     onDismiss: () -> Unit,
     onSelectProvider: (String) -> Unit,
     onSelectModel: (String) -> Unit,
@@ -111,7 +113,28 @@ fun ModelSheet(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(8.dp))
+            Row(
+                Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.coach_model_cloud_toggle),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    Text(
+                        stringResource(R.string.coach_model_cloud_body),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                androidx.compose.material3.Switch(
+                    checked = cloudEnabled,
+                    onCheckedChange = onSetCloudAi,
+                    modifier = Modifier.padding(start = 12.dp),
+                )
+            }
+            Spacer(Modifier.height(4.dp))
 
             Text(stringResource(R.string.coach_model_provider), style = MaterialTheme.typography.titleSmall)
             NebiansProviderList(

@@ -130,6 +130,8 @@
     <string name="coach_model_change">Change model</string>
     <string name="coach_model_title">Choose a model</string>
     <string name="coach_model_body">Free Nebians models need no key. Scraped models answer through an on-device tool protocol, so the coach can still read your timeline before replying.</string>
+    <string name="coach_model_cloud_toggle">Use cloud AI</string>
+    <string name="coach_model_cloud_body">The selected model only answers when this is on. Off means everything stays on this phone.</string>
     <string name="coach_model_provider">Provider</string>
     <string name="coach_model_model">Model</string>
     <string name="coach_model_effort">Reasoning effort</string>

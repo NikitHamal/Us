@@ -314,6 +314,10 @@ class CoachViewModel @Inject constructor(
 
     fun setModelSheetVisible(visible: Boolean) = _uiState.update { it.copy(showModelSheet = visible) }
 
+    fun setCloudAi(enabled: Boolean) {
+        viewModelScope.launch { settings.setCloudAi(enabled) }
+    }
+
     fun selectProvider(slug: String) {
         viewModelScope.launch { settings.setNebiansProvider(slug) }
     }

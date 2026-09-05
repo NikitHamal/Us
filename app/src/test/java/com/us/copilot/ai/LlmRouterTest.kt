@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/** Verifies the offline-first escalation policy in [LlmRouter]. */
+/** Verifies the explicit-selection-wins routing policy in [LlmRouter]. */
 class LlmRouterTest {
 
     private val request = ToneRequest(text = "any message")
@@ -50,39 +50,22 @@ class LlmRouterTest {
     }
 
     @Test
-    fun `high offline confidence never escalates`() = runTest {
-        val result = router(offlineConfidence = 0.85f, cloudUsable = true).analyzeTone(request)
-        assertEquals(ProviderId.OFFLINE, result.valueOrNull?.provider)
-    }
-
-    @Test
-    fun `low confidence escalates when cloud is enabled`() = runTest {
-        val result = router(offlineConfidence = 0.4f, cloudUsable = true).analyzeTone(request)
-        assertEquals(ProviderId.CLOUD, result.valueOrNull?.provider)
-    }
-
-    @Test
-    fun `low confidence prefers nebians when both are usable`() = runTest {
-        val result = router(offlineConfidence = 0.4f, cloudUsable = true, nebiansUsable = true)
+    fun `selected nebians model wins even when offline is confident`() = runTest {
+        val result = router(offlineConfidence = 0.95f, cloudUsable = true, nebiansUsable = true)
             .analyzeTone(request)
         assertEquals(ProviderId.NEBIANS, result.valueOrNull?.provider)
     }
 
     @Test
-    fun `nebians failure falls through to legacy cloud`() = runTest {
-        val result = router(
-            offlineConfidence = 0.4f,
-            cloudUsable = true,
-            nebiansUsable = true,
-            nebiansResult = Outcome.Failure(AppError.NoNetwork),
-        ).analyzeTone(request)
-        assertEquals(ProviderId.CLOUD, result.valueOrNull?.provider)
+    fun `everything disabled stays offline`() = runTest {
+        val result = router(offlineConfidence = 0.4f, cloudUsable = false).analyzeTone(request)
+        assertEquals(ProviderId.OFFLINE, result.valueOrNull?.provider)
     }
 
     @Test
-    fun `low confidence stays offline when cloud is disabled`() = runTest {
-        val result = router(offlineConfidence = 0.4f, cloudUsable = false).analyzeTone(request)
-        assertEquals(ProviderId.OFFLINE, result.valueOrNull?.provider)
+    fun `legacy cloud answers when nebians is unusable`() = runTest {
+        val result = router(offlineConfidence = 0.9f, cloudUsable = true).analyzeTone(request)
+        assertEquals(ProviderId.CLOUD, result.valueOrNull?.provider)
     }
 
     @Test
@@ -96,9 +79,24 @@ class LlmRouterTest {
     }
 
     @Test
-    fun `threshold boundary does not escalate`() = runTest {
-        val result = router(offlineConfidence = CONFIDENCE_THRESHOLD, cloudUsable = true)
-            .analyzeTone(request)
+    fun `nebians failure falls back to offline when cloud is disabled`() = runTest {
+        val result = router(
+            offlineConfidence = 0.3f,
+            cloudUsable = false,
+            nebiansUsable = true,
+            nebiansResult = Outcome.Failure(AppError.NoNetwork),
+        ).analyzeTone(request)
         assertEquals(ProviderId.OFFLINE, result.valueOrNull?.provider)
+    }
+
+    @Test
+    fun `nebians failure falls through to legacy cloud`() = runTest {
+        val result = router(
+            offlineConfidence = 0.4f,
+            cloudUsable = true,
+            nebiansUsable = true,
+            nebiansResult = Outcome.Failure(AppError.NoNetwork),
+        ).analyzeTone(request)
+        assertEquals(ProviderId.CLOUD, result.valueOrNull?.provider)
     }
 }
