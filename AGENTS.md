@@ -202,6 +202,17 @@ workflow; tests and the file-size guard run inside this same job before the APK 
 - **2026-09-05** — Initial end‑to‑end implementation of all modules A–D, CI/CD, privacy layer.
 - **2026-09-05** — Workflow activated at `.github/workflows/release.yml`; triggers on any branch,
   path-filtered to app/gradle/scripts changes. Separate `ci.yml` removed — one workflow only.
+- **2026-09-05** — UI/UX overhaul. Design system now derives from the launcher icon
+  (rose `#8F4A5C`, blush `#FFD9E0`) rather than drifting from it; added `UsGradients`
+  and `BrandHero`/`QuietGroup`/`BrandBackdrop`. Typography moved to **Poppins** via the
+  Google Fonts downloadable-font provider (`font_certs.xml`), with negative tracking on
+  display/headline sizes and a graceful fallback to system sans when the provider is
+  unavailable, preserving offline-first. Dynamic colour now defaults **off** so the
+  wallpaper cannot repaint the brand. The Coach was rebuilt as a real **chat**
+  (`ChatModels`/`ChatBubbles`/`ChatComposer`): a scrolling transcript of user drafts,
+  coach lines, tone and rephrase cards, an animated typing bubble, inline retryable
+  errors, a floating IME-aware composer, and starter chips. Home gained a gradient hero.
+  CI actions bumped to Node-24-native majors to clear the deprecation warnings.
 - **2026-09-05** — Fixed R8 minify failure: `androidx.security:security-crypto` pulls in Tink,
   which references Error Prone annotations that are compile-time only. Added `-dontwarn` for
   `com.google.errorprone.annotations.**` plus Tink keep rules. Also added keep rules for
