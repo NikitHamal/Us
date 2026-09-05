@@ -15,6 +15,10 @@ Kotlin · Jetpack Compose · Material 3 · Hilt · Room + SQLCipher · minSdk 26
 
 ## Get the APK (no local build needed)
 
+> **One‑time setup:** the workflows are committed at `ci/workflows/`. Copy them to
+> `.github/workflows/` and commit (instructions in `ci/README.md`). GitHub blocked the agent from
+> writing that folder directly because its token had no `workflows` permission.
+
 **You never have to build this locally.** Every push to `main` produces a signed release APK.
 
 1. Push to `main`, or open **Actions → Release APK → Run workflow**.

@@ -148,7 +148,12 @@ interface LlmProvider {
 
 **You never build locally.** Push → Actions → download APK.
 
-Workflow: `.github/workflows/release.yml`
+> **⚠ Action required once:** the agent's GitHub token lacked the `workflows` permission, so
+> GitHub refused to accept files under `.github/workflows/`. The two workflows are committed at
+> **`ci/workflows/release.yml`** and **`ci/workflows/ci.yml`**. Copy them into
+> `.github/workflows/` and commit (see `ci/README.md`) — one commit and CI is live.
+
+Workflow: `.github/workflows/release.yml` (currently staged at `ci/workflows/release.yml`)
 1. Triggers: `push` to `main`/`master`, any `v*` tag, and `workflow_dispatch`.
 2. `ubuntu-latest`, **JDK 17** (Temurin), Android SDK, Gradle cache via `gradle/actions/setup-gradle`.
 3. **Keystore**: `keystore.properties` + `app/keystore/release.jks` are committed with default
@@ -197,3 +202,4 @@ Workflow: `.github/workflows/release.yml`
 
 ### Changelog
 - **2026-09-05** — Initial end‑to‑end implementation of all modules A–D, CI/CD, privacy layer.
+- **2026-09-05** — Workflows relocated to `ci/workflows/` pending the `workflows` token scope.
