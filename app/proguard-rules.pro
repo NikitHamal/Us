@@ -39,7 +39,14 @@
 # so tell it these are expected to be absent.
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn javax.annotation.**
+# Tink's KeysDownloader fetches remote keysets over google-api-client + joda-time. We never
+# call it (we only use local AES keysets via EncryptedSharedPreferences), and neither library
+# is a dependency, so these references are unreachable dead code.
+-dontwarn com.google.api.client.**
+-dontwarn org.joda.time.**
 -keep class com.google.crypto.tink.** { *; }
+# Explicitly drop the remote-keyset downloader so R8 never has to resolve its deps.
+-dontwarn com.google.crypto.tink.util.KeysDownloader**
 -keepclassmembers class * extends com.google.crypto.tink.shaded.protobuf.GeneratedMessageLite {
     <fields>;
 }
