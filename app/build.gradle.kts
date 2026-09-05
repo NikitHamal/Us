@@ -134,6 +134,7 @@ dependencies {
     implementation(libs.compose.material3.window)
     implementation(libs.compose.material.icons)
     implementation(libs.compose.animation)
+    implementation(libs.compose.ui.text.google.fonts)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
 

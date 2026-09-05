@@ -25,7 +25,7 @@ data class AppPreferences(
     val biometricLockEnabled: Boolean = false,
     val cloudAiEnabled: Boolean = false,
     val notificationCaptureEnabled: Boolean = false,
-    val dynamicColorEnabled: Boolean = true,
+    val dynamicColorEnabled: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val analyticsOptIn: Boolean = false,
     val partnerConsentRecorded: Boolean = false,

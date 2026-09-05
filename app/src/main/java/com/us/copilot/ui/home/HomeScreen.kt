@@ -1,6 +1,8 @@
 package com.us.copilot.ui.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -8,9 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.EditNote
@@ -24,8 +28,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,11 +42,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.us.copilot.R
 import com.us.copilot.core.model.ProfileOwner
+import com.us.copilot.ui.components.BrandHero
 import com.us.copilot.ui.components.LoadingState
 import com.us.copilot.ui.components.SectionHeader
 import com.us.copilot.ui.components.UsCard
 import com.us.copilot.ui.timeline.MemoryRow
 import com.us.copilot.ui.theme.UsDimens
+import com.us.copilot.ui.theme.UsShapes
 import java.time.LocalTime
 
 @Composable
@@ -59,9 +67,18 @@ fun HomeScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = {
+                    Text(
+                        stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
                 actions = {
                     IconButton(onClick = onOpenSettings) {
                         Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.nav_settings))
@@ -80,7 +97,7 @@ fun HomeScreen(
                     top = 8.dp,
                     bottom = contentPadding.calculateBottomPadding() + UsDimens.sectionSpacing,
                 ),
-                verticalArrangement = Arrangement.spacedBy(UsDimens.itemSpacing),
+                verticalArrangement = Arrangement.spacedBy(UsDimens.gutter),
             ) {
                 item { GreetingCard(state, onOpenCheckIn) }
 
@@ -138,25 +155,47 @@ private fun GreetingCard(state: HomeUiState, onOpenCheckIn: () -> Unit) {
             else -> R.string.home_greeting_evening
         },
     )
-    UsCard(
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        onClick = onOpenCheckIn,
-    ) {
+    BrandHero {
         Text(
-            text = state.me?.name?.takeIf { it.isNotBlank() }?.let { "$greeting, $it" } ?: greeting,
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            text = greeting,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(6.dp))
-        Text(
-            text = if (state.hasCheckedInToday) {
-                stringResource(R.string.home_check_in_done, state.streakDays)
-            } else {
-                stringResource(R.string.home_check_in_prompt)
-            },
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-        )
+        state.me?.name?.takeIf { it.isNotBlank() }?.let { name ->
+            Text(
+                text = name,
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        Spacer(Modifier.height(14.dp))
+        Surface(
+            onClick = onOpenCheckIn,
+            shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.75f),
+        ) {
+            Row(
+                Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    if (state.hasCheckedInToday) Icons.Filled.Favorite else Icons.Filled.MoodBad,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(
+                    text = if (state.hasCheckedInToday) {
+                        stringResource(R.string.home_check_in_done, state.streakDays)
+                    } else {
+                        stringResource(R.string.home_check_in_prompt)
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(start = 10.dp),
+                )
+            }
+        }
     }
 }
 
@@ -167,14 +206,14 @@ private fun QuickActions(
     onOpenProfiles: () -> Unit,
     onOpenTimeline: () -> Unit,
 ) {
-    UsCard {
+    Column {
         SectionHeader(title = stringResource(R.string.home_quick_actions))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             QuickAction(Icons.Filled.AutoAwesome, stringResource(R.string.home_action_check_message), Modifier.weight(1f), onOpenCoach)
             QuickAction(Icons.Filled.EditNote, stringResource(R.string.home_action_journal), Modifier.weight(1f), onOpenJournal)
         }
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             QuickAction(Icons.Filled.Groups, stringResource(R.string.home_action_profiles), Modifier.weight(1f), onOpenProfiles)
             QuickAction(Icons.Filled.Favorite, stringResource(R.string.nav_timeline), Modifier.weight(1f), onOpenTimeline)
         }
@@ -188,18 +227,30 @@ private fun QuickAction(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
-    androidx.compose.material3.Surface(
+    Surface(
         onClick = onClick,
         modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        shape = UsShapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainer,
     ) {
         Column(
-            Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-            Text(label, style = MaterialTheme.typography.labelLarge)
+            Box(
+                Modifier
+                    .size(40.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            Text(label, style = MaterialTheme.typography.titleSmall)
         }
     }
 }

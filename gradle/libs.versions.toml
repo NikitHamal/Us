@@ -46,6 +46,7 @@ compose-material3 = { module = "androidx.compose.material3:material3" }
 compose-material3-window = { module = "androidx.compose.material3:material3-window-size-class" }
 compose-material-icons = { module = "androidx.compose.material:material-icons-extended" }
 compose-animation = { module = "androidx.compose.animation:animation" }
+compose-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
 compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
 

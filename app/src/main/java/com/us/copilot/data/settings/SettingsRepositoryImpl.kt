@@ -56,7 +56,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 biometricLockEnabled = prefs[Keys.biometric] ?: false,
                 cloudAiEnabled = prefs[Keys.cloudAi] ?: false,
                 notificationCaptureEnabled = prefs[Keys.notificationCapture] ?: false,
-                dynamicColorEnabled = prefs[Keys.dynamicColor] ?: true,
+                dynamicColorEnabled = prefs[Keys.dynamicColor] ?: false,
                 themeMode = prefs[Keys.themeMode]
                     ?.let { name -> ThemeMode.entries.firstOrNull { it.name == name } }
                     ?: ThemeMode.SYSTEM,

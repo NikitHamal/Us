@@ -22,7 +22,7 @@ data class MainUiState(
     val isReady: Boolean = false,
     val onboardingComplete: Boolean = false,
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val dynamicColor: Boolean = true,
+    val dynamicColor: Boolean = false,
     val lockEnabled: Boolean = false,
     val isUnlocked: Boolean = false,
 ) {
