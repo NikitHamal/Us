@@ -1,5 +1,6 @@
 package com.us.copilot.ai.nebians
 
+import com.us.copilot.ai.NebiansGate
 import com.us.copilot.ai.agent.AgentRequestSpec
 import com.us.copilot.ai.agent.AgentRunner
 import com.us.copilot.ai.agent.AgentStep
