@@ -15,13 +15,15 @@ Kotlin · Jetpack Compose · Material 3 · Hilt · Room + SQLCipher · minSdk 26
 
 ## Get the APK (no local build needed)
 
-> **One‑time setup:** the workflows are committed at `ci/workflows/`. Copy them to
-> `.github/workflows/` and commit (instructions in `ci/README.md`). GitHub blocked the agent from
-> writing that folder directly because its token had no `workflows` permission.
+> **One‑time setup — rename one folder:** GitHub blocked the agent from writing
+> `.github/workflows/` (its token has no `workflows` permission), so the workflows sit in
+> **`dot-github/`**. Run `git mv dot-github .github && git commit -m "Activate workflows" && git push`
+> and CI is live. Details in `dot-github/README.md`.
 
 **You never have to build this locally.** Every push to `main` produces a signed release APK.
 
-1. Push to `main`, or open **Actions → Release APK → Run workflow**.
+1. Push **any branch** (the build runs whenever `app/**`, gradle files or `scripts/**` change),
+   or open **Actions → Release APK → Run workflow** and pick a branch.
 2. Wait for the green tick.
 3. Open the run → **Artifacts** → download **`us-release-apk`**.
 4. Inside you get `Us-v1.0.0-1-a1b2c3d-2026-09-05-release.apk` and `SHA256SUMS.txt`.

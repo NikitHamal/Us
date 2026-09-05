@@ -149,12 +149,13 @@ interface LlmProvider {
 **You never build locally.** Push → Actions → download APK.
 
 > **⚠ Action required once:** the agent's GitHub token lacked the `workflows` permission, so
-> GitHub refused to accept files under `.github/workflows/`. The two workflows are committed at
-> **`ci/workflows/release.yml`** and **`ci/workflows/ci.yml`**. Copy them into
-> `.github/workflows/` and commit (see `ci/README.md`) — one commit and CI is live.
+> GitHub refused files under `.github/workflows/`. Both workflows are committed under
+> **`dot-github/`**. Activate with `git mv dot-github .github`, commit, push. See `dot-github/README.md`.
 
-Workflow: `.github/workflows/release.yml` (currently staged at `ci/workflows/release.yml`)
-1. Triggers: `push` to `main`/`master`, any `v*` tag, and `workflow_dispatch`.
+Workflow: `.github/workflows/release.yml` (shipped as `dot-github/workflows/release.yml`)
+1. Triggers: `push` to **any branch** filtered on `app/**`, `gradle/**`, `*.gradle.kts`,
+   `gradle.properties`, `settings.gradle.kts`, `keystore.properties`, `scripts/**` and the workflow
+   file itself; any `v*` tag; and `workflow_dispatch` from any branch.
 2. `ubuntu-latest`, **JDK 17** (Temurin), Android SDK, Gradle cache via `gradle/actions/setup-gradle`.
 3. **Keystore**: `keystore.properties` + `app/keystore/release.jks` are committed with default
    passwords (personal‑use project). If they are missing, CI **generates** them with `keytool`
@@ -202,4 +203,4 @@ Workflow: `.github/workflows/release.yml` (currently staged at `ci/workflows/rel
 
 ### Changelog
 - **2026-09-05** — Initial end‑to‑end implementation of all modules A–D, CI/CD, privacy layer.
-- **2026-09-05** — Workflows relocated to `ci/workflows/` pending the `workflows` token scope.
+- **2026-09-05** — Workflows relocated to `dot-github/` (rename to `.github/` to activate); release build now triggers on any branch, path-filtered to app/gradle/scripts changes.

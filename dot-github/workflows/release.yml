@@ -2,8 +2,17 @@ name: Release APK
 
 on:
   push:
-    branches: [main, master]
+    branches: ['**']
     tags: ['v*']
+    paths:
+      - 'app/**'
+      - 'gradle/**'
+      - '*.gradle.kts'
+      - 'gradle.properties'
+      - 'settings.gradle.kts'
+      - 'keystore.properties'
+      - 'scripts/**'
+      - '.github/workflows/release.yml'
   workflow_dispatch:
     inputs:
       notes:
@@ -20,7 +29,7 @@ concurrency:
 
 env:
   # Default signing material for this personal-use project.
-  # Override by defining repository secrets of the same name if you ever want to.
+  # Define repository secrets with the same names to override them.
   US_STORE_PASSWORD: ${{ secrets.US_STORE_PASSWORD || 'uscopilot' }}
   US_KEY_ALIAS: ${{ secrets.US_KEY_ALIAS || 'us-release' }}
   US_KEY_PASSWORD: ${{ secrets.US_KEY_PASSWORD || 'uscopilot' }}
@@ -124,6 +133,7 @@ jobs:
             echo "|---|---|"
             echo "| File | \`${{ steps.meta.outputs.apk_name }}\` |"
             echo "| Version | ${{ steps.meta.outputs.version_name }} (${{ steps.meta.outputs.version_code }}) |"
+            echo "| Branch | \`${{ github.ref_name }}\` |"
             echo "| Size | $SIZE_HUMAN |"
             echo "| SHA-256 | \`$SHA256\` |"
             echo ""

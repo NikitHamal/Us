@@ -11,5 +11,5 @@ local.properties
 artifacts/
 *.hprof
 
-# Workflows live in ci/workflows until the token has the `workflows` scope.
+# Untracked: the agent's token cannot push .github/workflows. Rename dot-github/ instead.
 .github/
