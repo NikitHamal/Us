@@ -21,9 +21,9 @@ import com.us.copilot.core.model.ConflictStyle
 import com.us.copilot.core.model.LoveLanguage
 import com.us.copilot.core.model.Profile
 import com.us.copilot.core.model.ProfileVocabulary
+import com.us.copilot.ui.components.BigFiveSliders
 import com.us.copilot.ui.components.ChipMultiSelect
 import com.us.copilot.ui.components.RadioOptionList
-import com.us.copilot.ui.components.ScaleSlider
 import com.us.copilot.ui.theme.UsDimens
 
 /** Renders the body of a single onboarding page. Navigation chrome lives in OnboardingScreen. */
@@ -122,7 +122,7 @@ fun OnboardingPageContent(
                 title = stringResource(R.string.onboarding_bigfive_title),
                 body = stringResource(R.string.onboarding_bigfive_body),
             ) {
-                BigFiveEditor(profile.bigFive, viewModel::updateBigFive)
+                BigFiveSliders(profile.bigFive, viewModel::updateBigFive)
             }
 
             OnboardingPage.ME_STRESS, OnboardingPage.PARTNER_STRESS -> QuestionPage(
@@ -209,25 +209,6 @@ private fun NamePage(value: String, isPartner: Boolean, onChange: (String) -> Un
             ),
             modifier = Modifier.fillMaxWidth(),
         )
-    }
-}
-
-@Composable
-private fun BigFiveEditor(value: BigFive, onChange: (BigFive) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(UsDimens.itemSpacing)) {
-        ScaleSlider("Openness", value.openness / 20, { onChange(value.copy(openness = it * 20)) })
-        ScaleSlider("Conscientiousness", value.conscientiousness / 20) {
-            onChange(value.copy(conscientiousness = it * 20))
-        }
-        ScaleSlider("Extraversion", value.extraversion / 20) {
-            onChange(value.copy(extraversion = it * 20))
-        }
-        ScaleSlider("Agreeableness", value.agreeableness / 20) {
-            onChange(value.copy(agreeableness = it * 20))
-        }
-        ScaleSlider("Emotional reactivity", value.neuroticism / 20) {
-            onChange(value.copy(neuroticism = it * 20))
-        }
     }
 }
 

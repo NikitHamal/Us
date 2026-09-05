@@ -148,11 +148,8 @@ interface LlmProvider {
 
 **You never build locally.** Push → Actions → download APK.
 
-> **⚠ Action required once:** the agent's GitHub token lacked the `workflows` permission, so
-> GitHub refused files under `.github/workflows/`. Both workflows are committed under
-> **`dot-github/`**. Activate with `git mv dot-github .github`, commit, push. See `dot-github/README.md`.
-
-Workflow: `.github/workflows/release.yml` (shipped as `dot-github/workflows/release.yml`)
+Workflow: `.github/workflows/release.yml` — the single build workflow. There is no separate CI
+workflow; tests and the file-size guard run inside this same job before the APK is assembled.
 1. Triggers: `push` to **any branch** filtered on `app/**`, `gradle/**`, `*.gradle.kts`,
    `gradle.properties`, `settings.gradle.kts`, `keystore.properties`, `scripts/**` and the workflow
    file itself; any `v*` tag; and `workflow_dispatch` from any branch.
@@ -203,4 +200,10 @@ Workflow: `.github/workflows/release.yml` (shipped as `dot-github/workflows/rele
 
 ### Changelog
 - **2026-09-05** — Initial end‑to‑end implementation of all modules A–D, CI/CD, privacy layer.
-- **2026-09-05** — Workflows relocated to `dot-github/` (rename to `.github/` to activate); release build now triggers on any branch, path-filtered to app/gradle/scripts changes.
+- **2026-09-05** — Workflow activated at `.github/workflows/release.yml`; triggers on any branch,
+  path-filtered to app/gradle/scripts changes. Separate `ci.yml` removed — one workflow only.
+- **2026-09-05** — Fixed release compile errors: `ScaleSlider` was being called with a trailing
+  lambda, which Kotlin bound to the last parameter (`valueLabels`) instead of `onValueChange`. The
+  five OCEAN sliders are now one shared `BigFiveSliders` composable using named arguments, so the
+  bug cannot recur in two places. Also removed an illegal top-level import of
+  `androidx.compose.foundation.layout.weight`, which is internal to `RowScope`/`ColumnScope`.

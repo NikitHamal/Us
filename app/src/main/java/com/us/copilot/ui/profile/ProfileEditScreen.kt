@@ -31,9 +31,9 @@ import com.us.copilot.core.model.ConflictStyle
 import com.us.copilot.core.model.LoveLanguage
 import com.us.copilot.core.model.ProfileOwner
 import com.us.copilot.core.model.ProfileVocabulary
+import com.us.copilot.ui.components.BigFiveSliders
 import com.us.copilot.ui.components.ChipMultiSelect
 import com.us.copilot.ui.components.RadioOptionList
-import com.us.copilot.ui.components.ScaleSlider
 import com.us.copilot.ui.components.SectionHeader
 import com.us.copilot.ui.components.UsCard
 import com.us.copilot.ui.onboarding.LoveLanguageRow
@@ -176,22 +176,10 @@ fun ProfileEditScreen(
 
             UsCard {
                 SectionHeader(title = stringResource(R.string.profile_bigfive))
-                val big5 = draft.bigFive
-                ScaleSlider("Openness", big5.openness / 20) {
-                    viewModel.editBigFive(big5.copy(openness = it * 20))
-                }
-                ScaleSlider("Conscientiousness", big5.conscientiousness / 20) {
-                    viewModel.editBigFive(big5.copy(conscientiousness = it * 20))
-                }
-                ScaleSlider("Extraversion", big5.extraversion / 20) {
-                    viewModel.editBigFive(big5.copy(extraversion = it * 20))
-                }
-                ScaleSlider("Agreeableness", big5.agreeableness / 20) {
-                    viewModel.editBigFive(big5.copy(agreeableness = it * 20))
-                }
-                ScaleSlider("Emotional reactivity", big5.neuroticism / 20) {
-                    viewModel.editBigFive(big5.copy(neuroticism = it * 20))
-                }
+                BigFiveSliders(
+                    value = draft.bigFive,
+                    onChange = viewModel::editBigFive,
+                )
             }
 
             OutlinedTextField(

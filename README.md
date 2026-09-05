@@ -5,7 +5,6 @@
 **A private, offline‑first Android app that helps you understand your partner, defuse conflict, and say the hard thing kindly.**
 
 [![Release APK](https://github.com/NikitHamal/Us/actions/workflows/release.yml/badge.svg)](https://github.com/NikitHamal/Us/actions/workflows/release.yml)
-[![CI](https://github.com/NikitHamal/Us/actions/workflows/ci.yml/badge.svg)](https://github.com/NikitHamal/Us/actions/workflows/ci.yml)
 
 Kotlin · Jetpack Compose · Material 3 · Hilt · Room + SQLCipher · minSdk 26 · targetSdk 34
 
@@ -14,11 +13,6 @@ Kotlin · Jetpack Compose · Material 3 · Hilt · Room + SQLCipher · minSdk 26
 ---
 
 ## Get the APK (no local build needed)
-
-> **One‑time setup — rename one folder:** GitHub blocked the agent from writing
-> `.github/workflows/` (its token has no `workflows` permission), so the workflows sit in
-> **`dot-github/`**. Run `git mv dot-github .github && git commit -m "Activate workflows" && git push`
-> and CI is live. Details in `dot-github/README.md`.
 
 **You never have to build this locally.** Every push to `main` produces a signed release APK.
 
